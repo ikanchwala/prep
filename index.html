@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#171310">
+<title>Rosati's Prep — STC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#C8192A; --red-dk:#9E1220;
+  --green:#2E7D46; --green-dk:#1B5C2E;
+  --gold:#D4A017; --gold-lt:#E8B93A;
+  --cream:#F5EDD8;
+  --bg:#171310; --bg2:#221C17; --card:#2A231D; --card2:#332A22;
+  --line:#3E342A; --line2:#4A3E31;
+  --txt:#F5EDD8; --txt2:#B8AB93; --txt3:#8A7D66;
+  --gray:#6B6155;
+  --r:14px;
+  --font-d:'Anton','Arial Narrow',Impact,sans-serif;
+  --font-b:'Barlow Condensed','Arial Narrow',Arial,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--bg);color:var(--txt);font-family:var(--font-b);font-size:17px;line-height:1.35;overscroll-behavior:none}
+#app{max-width:560px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;position:relative}
+button{font-family:var(--font-b);cursor:pointer;border:none;background:none;color:inherit}
+input,select,textarea{font-family:var(--font-b);font-size:18px;background:var(--bg2);border:1.5px solid var(--line2);color:var(--txt);border-radius:10px;padding:12px 14px;width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--gold);outline-offset:0;border-color:var(--gold)}
+label{display:block;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--txt3);margin:14px 0 5px;font-weight:600}
+h1,h2,h3{font-family:var(--font-d);font-weight:400;letter-spacing:.02em}
+.screen{flex:1;padding:18px 16px calc(96px + env(safe-area-inset-bottom));overflow-y:auto}
+.topbar{position:sticky;top:0;z-index:20;background:linear-gradient(var(--bg) 70%,transparent);padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between}
+.brandline{display:flex;align-items:center;gap:10px}
+.brandmark{width:34px;height:34px;border-radius:9px;background:var(--red);display:grid;place-items:center;font-family:var(--font-d);font-size:19px;color:#fff}
+.topbar h1{font-size:21px;text-transform:uppercase}
+.topbar .sub{font-size:13px;color:var(--txt3);letter-spacing:.1em;text-transform:uppercase}
+.iconbtn{width:42px;height:42px;border-radius:11px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;font-size:18px}
+#nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:560px;background:rgba(23,19,16,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:flex;z-index:30;padding-bottom:env(safe-area-inset-bottom)}
+#nav button{flex:1;padding:10px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--txt3);font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;position:relative}
+#nav button .ic{font-size:21px;line-height:1}
+#nav button.on{color:var(--gold-lt)}
+#nav .badge{position:absolute;top:5px;right:calc(50% - 22px);min-width:17px;height:17px;border-radius:9px;background:var(--red);color:#fff;font-size:11px;display:grid;place-items:center;padding:0 4px;font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.prepcard{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--gray);border-radius:var(--r);padding:14px 14px 12px;margin-bottom:12px}
+.prepcard.p-critical{border-left-color:var(--red)}
+.prepcard.p-high{border-left-color:var(--gold)}
+.prepcard.s-done{border-left-color:var(--green)}
+.prepcard.s-done .pc-nums{opacity:.85}
+.prepcard.s-progress{border-left-color:var(--gold-lt);background:var(--card2)}
+.pc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.pc-name{font-family:var(--font-d);font-size:21px;text-transform:uppercase;letter-spacing:.02em}
+.pc-meta{font-size:14px;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:99px;white-space:nowrap}
+.pill.gray{background:#3a332b;color:var(--txt2)}
+.pill.yellow{background:rgba(212,160,23,.18);color:var(--gold-lt)}
+.pill.green{background:rgba(46,125,70,.22);color:#6FCB8A}
+.pill.red{background:rgba(200,25,42,.2);color:#FF7A87}
+/* PAR | ON HAND (input) | MAKE */
+.pc-nums{display:flex;align-items:stretch;margin:12px 0 10px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.pc-num{flex:1;padding:9px 6px 8px;text-align:center;display:flex;flex-direction:column;justify-content:center}
+.pc-num+.pc-num{border-left:1px solid var(--line)}
+.pc-num .k{font-size:11.5px;letter-spacing:.14em;color:var(--txt3);text-transform:uppercase;font-weight:600}
+.pc-num .v{font-family:var(--font-d);font-size:24px;margin-top:1px}
+.pc-num .u{font-size:12px;color:var(--txt3)}
+.onhand{width:76px;margin:3px auto 0;text-align:center;font-family:var(--font-d);font-size:22px;padding:6px 4px;border-radius:9px;background:var(--card);border:1.5px dashed var(--line2)}
+.onhand:focus{border-style:solid}
+.onhand.empty{border-color:var(--gold);background:rgba(212,160,23,.07)}
+.pc-num.make{flex:1.25;background:linear-gradient(160deg,rgba(212,160,23,.22),rgba(212,160,23,.08));position:relative}
+.pc-num.make .v{font-size:38px;color:var(--gold-lt);text-shadow:0 2px 12px rgba(212,160,23,.35)}
+.pc-num.make.zero{background:rgba(46,125,70,.12)}
+.pc-num.make.zero .v{color:#6FCB8A;font-size:26px;text-shadow:none}
+.pc-num.make.uncounted .v{color:var(--txt3);font-size:15px;text-shadow:none}
+.pc-num.make.nopar .v{color:var(--txt3);font-size:15px;text-shadow:none}
+.batchline{font-size:15px;color:var(--txt2);background:rgba(212,160,23,.08);border:1px dashed rgba(212,160,23,.4);border-radius:9px;padding:7px 10px;margin-bottom:10px}
+.batchline b{color:var(--gold-lt)}
+.pc-actions{display:flex;gap:8px}
+.btn{flex:1;padding:14px 10px;border-radius:11px;font-size:16.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;text-align:center}
+.btn.primary{background:var(--red);color:#fff}
+.btn.go{background:var(--green);color:#fff}
+.btn.ghost{background:var(--card2);color:var(--txt2);border:1px solid var(--line2)}
+.btn.gold{background:var(--gold);color:#241c07}
+.btn.sm{flex:none;padding:10px 14px;font-size:14px}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.4}
+.assignchip{font-size:14.5px;color:var(--txt2);background:var(--bg2);border:1px solid var(--line);border-radius:99px;padding:4px 11px}
+.assignchip.me{border-color:var(--gold);color:var(--gold-lt)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:9px 16px;border-radius:99px;background:var(--card);border:1px solid var(--line);font-size:15px;font-weight:600;letter-spacing:.05em;color:var(--txt2);text-transform:uppercase}
+.chip.on{background:var(--cream);color:#241c07;border-color:var(--cream)}
+.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 8px;text-align:center}
+.stat .v{font-family:var(--font-d);font-size:27px}
+.stat .k{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--txt3);font-weight:600;margin-top:2px}
+.stat.red .v{color:#FF7A87}.stat.green .v{color:#6FCB8A}.stat.gold .v{color:var(--gold-lt)}
+.progressbar{height:10px;border-radius:5px;background:var(--bg2);overflow:hidden;margin:8px 0 4px}
+.progressbar i{display:block;height:100%;background:linear-gradient(90deg,var(--green-dk),var(--green))}
+.sechead{font-family:var(--font-d);font-size:16px;letter-spacing:.14em;text-transform:uppercase;color:var(--txt3);margin:20px 0 10px;display:flex;align-items:center;gap:10px}
+.sechead:after{content:"";flex:1;height:1px;background:var(--line)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:none}
+.row .t{font-weight:600;font-size:17px}
+.row .s{font-size:14px;color:var(--txt3)}
+.row .r{text-align:right;font-family:var(--font-d);font-size:19px}
+.sheetwrap{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.6)}
+.sheet{width:100%;max-width:560px;background:var(--bg2);border-radius:20px 20px 0 0;border-top:1px solid var(--line2);padding:18px 18px calc(20px + env(safe-area-inset-bottom));max-height:88dvh;overflow-y:auto;animation:up .18s ease-out}
+@keyframes up{from{transform:translateY(30px);opacity:.4}to{transform:none;opacity:1}}
+.sheet h2{font-size:22px;text-transform:uppercase;margin-bottom:2px}
+.sheet .sub{color:var(--txt3);font-size:15px;margin-bottom:8px}
+.grabber{width:44px;height:5px;border-radius:3px;background:var(--line2);margin:0 auto 12px}
+.optgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.optgrid .opt{padding:13px 8px;border-radius:10px;background:var(--card);border:1.5px solid var(--line2);font-size:16px;font-weight:600;text-align:center}
+.optgrid .opt.on{border-color:var(--gold);background:rgba(212,160,23,.12);color:var(--gold-lt)}
+.stepper{display:flex;align-items:center;gap:10px;margin-top:6px}
+.stepper button{width:56px;height:56px;border-radius:12px;background:var(--card);border:1px solid var(--line2);font-size:26px;font-weight:700}
+.stepper input{text-align:center;font-family:var(--font-d);font-size:28px;height:56px}
+.dayparsgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.dayparsgrid .dp{text-align:center}
+.dayparsgrid .dp span{display:block;font-size:11px;color:var(--txt3);letter-spacing:.08em;margin-bottom:3px;text-transform:uppercase}
+.dayparsgrid input{padding:8px 2px;text-align:center;font-size:16px}
+.login{flex:1;display:flex;flex-direction:column;justify-content:center;padding:28px 22px calc(28px + env(safe-area-inset-bottom))}
+.logo-lockup{text-align:center;margin-bottom:26px}
+.logo-lockup .mark{width:66px;height:66px;margin:0 auto 12px;border-radius:16px;background:var(--red);display:grid;place-items:center;font-family:var(--font-d);font-size:38px;color:#fff;box-shadow:0 8px 30px rgba(200,25,42,.35)}
+.logo-lockup h1{font-size:30px;text-transform:uppercase}
+.logo-lockup p{color:var(--txt3);letter-spacing:.22em;text-transform:uppercase;font-size:13px;margin-top:4px}
+.usergrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.usercard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 12px;text-align:center}
+.usercard .av{width:46px;height:46px;border-radius:50%;margin:0 auto 8px;display:grid;place-items:center;font-family:var(--font-d);font-size:20px;background:var(--card2);border:1px solid var(--line2)}
+.usercard.role-admin .av{background:rgba(200,25,42,.2);color:#FF8B96}
+.usercard.role-manager .av{background:rgba(212,160,23,.18);color:var(--gold-lt)}
+.usercard.role-employee .av{background:rgba(46,125,70,.18);color:#6FCB8A}
+.usercard .nm{font-weight:700;font-size:17px}
+.usercard .rl{font-size:12.5px;color:var(--txt3);text-transform:uppercase;letter-spacing:.1em}
+.pinpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:290px;margin:14px auto 0}
+.pinpad button{height:64px;border-radius:14px;background:var(--card);border:1px solid var(--line2);font-family:var(--font-d);font-size:24px}
+.pindots{display:flex;justify-content:center;gap:14px;margin:16px 0 4px}
+.pindots i{width:14px;height:14px;border-radius:50%;border:2px solid var(--line2)}
+.pindots i.f{background:var(--gold);border-color:var(--gold)}
+.shake{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-7px)}50%{transform:translateX(7px)}75%{transform:translateX(-4px)}}
+.alertcard{border-left:5px solid var(--red)}
+.notice{font-size:14.5px;color:var(--txt3);text-align:center;padding:26px 10px}
+.demo-tag{font-size:10.5px;letter-spacing:.1em;background:var(--bg2);border:1px solid var(--line);color:var(--txt3);border-radius:5px;padding:2px 6px;text-transform:uppercase;vertical-align:2px;margin-left:6px}
+.linklike{color:var(--gold-lt);font-weight:600;text-decoration:underline}
+.table{width:100%;border-collapse:collapse;font-size:15.5px}
+.table th{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--txt3);text-align:left;padding:7px 6px;border-bottom:1px solid var(--line2)}
+.table td{padding:9px 6px;border-bottom:1px solid var(--line)}
+.table td.n{font-family:var(--font-d);font-size:17px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(104px + env(safe-area-inset-bottom));background:var(--cream);color:#241c07;font-weight:700;padding:12px 20px;border-radius:99px;z-index:60;font-size:16px;box-shadow:0 8px 26px rgba(0,0,0,.5);white-space:nowrap;animation:up .18s ease-out}
+.warnbox{background:rgba(200,25,42,.1);border:1px solid rgba(200,25,42,.4);border-radius:11px;padding:11px 13px;font-size:15.5px;margin-bottom:12px}
+.okbox{background:rgba(46,125,70,.12);border:1px solid rgba(46,125,70,.4);border-radius:11px;padding:11px 13px;font-size:15.5px;margin-bottom:12px}
+.holidaybanner{background:linear-gradient(120deg,rgba(200,25,42,.25),rgba(212,160,23,.2));border:1px solid rgba(212,160,23,.5);border-radius:var(--r);padding:13px 15px;margin-bottom:12px}
+.holidaybanner b{font-family:var(--font-d);font-size:19px;letter-spacing:.04em;text-transform:uppercase}
+.holidaybanner .s{font-size:15px;color:var(--txt2);margin-top:2px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* =====================================================================
+   ROSATI'S PREP v7 — STC (550 N Kirk Rd)
+   v7: fixed save errors (slim payloads, serialized saves, backoff),
+   20s device sync, completed items show ✓ 0, Make More reopen,
+   Garlic Bread in Kitchen, restore/migrate from old app export.
+===================================================================== */
+
+const PRELOADED_PARS={"Dough":{"u":"trays","b":3,"p":[9,9,10,12,16,14,11],"n":null},"Sauce":{"u":"buckets","b":1,"p":[3,3,4,4,6,4,3],"n":null},"Cheese":{"u":"tubs","b":4,"p":[12,12,12,16,20,20,16],"n":null},"Canadian Bacon":{"u":"1/6 pans","b":2,"p":[2,2,3,3,4,3,3],"n":null},"Chicken":{"u":"1/3 pans","b":2,"p":[2,2,2,2,3,2,2],"n":null},"Cooked Sausage":{"u":"1/3 pans","b":2,"p":[1,1,1,1,1,1,1],"n":null},"Bacon":{"u":"1/6 pans","b":2,"p":[2,2,3,3,4,3,3],"n":null},"Green Pepper":{"u":"1/3 pans","b":1,"p":[3,3,4,4,6,5,3],"n":null},"Onion":{"u":"1/3 pans","b":1,"p":[2,3,3,4,5,4,2],"n":null},"Garlic":{"u":"1/6 pans","b":1,"p":[1,1,1,2,2,2,1],"n":null},"Tomato":{"u":"1/3 pans","b":1,"p":[2,2,2,2,3,2,2],"n":null},"Red Onion":{"u":"1/6 pans","b":1,"p":[1,1,1,1,2,1,1],"n":null},"Alfredo Sauce":{"u":"1/3 pans","b":2,"p":[2,2,2,2,2,2,2],"n":null},"Garlic Spread":{"u":"1/2 pans","b":1,"p":[1,1,1,1,1,1,1],"n":null},"Marinara Sauce":{"u":"buckets","b":2,"p":[1,1,1,2,2,2,1],"n":null},"Hot Sauce":{"u":"buckets","b":1,"p":[1,1,1,1,1,1,1],"n":null},"Lasagna":{"u":"pcs","b":1,"p":[6,6,6,6,6,6,6],"n":"Lasagna (defrosted)"},"Mostaccioli":{"u":"1/3 pans","b":2,"p":[1,1,1,1,2,1,1],"n":null},"Fettucine":{"u":"1/3 pans","b":2,"p":[1,1,1,1,2,1,1],"n":null},"Spaghetti":{"u":"1/3 pans","b":2,"p":[1,1,1,1,2,1,1],"n":null},"Green Onion":{"u":"1/9 pans","b":1,"p":[1,1,1,1,1,1,1],"n":null},"Red Onion (Kitchen)":{"u":"1/9 pans","b":1,"p":[1,1,1,1,1,1,1],"n":null},"Chicken Breast":{"u":"1/2 pans","b":2,"p":[1,1,1,2,2,2,1],"n":null},"Chicken Wings":{"u":"tubs","b":2,"p":[1,1,1,1,2,1,1],"n":null},"Ribs":{"u":"1/2 slabs","b":1,"p":[6,6,7,7,8,7,6],"n":"Ribs (defrosted)"},"Ranch":{"u":"buckets","b":1,"p":[1,1,1,2,2,2,1],"n":null},"Italian":{"u":"buckets","b":1,"p":[1,1,1,1,1,1,1],"n":null},"Blue Cheese":{"u":"1/2 pans","b":1,"p":[1,1,1,1,1,1,1],"n":null}};
+const EMBEDDED_SALES={"2025-08-29":5989.63,"2025-08-30":4740.09,"2025-08-31":3275.67,"2025-09-01":2826.24,"2025-09-02":1481.45,"2025-09-03":3151.77,"2025-09-04":2556.53,"2025-09-05":5762.1,"2025-09-06":4016.43,"2025-09-07":2966.44,"2025-09-08":2734.94,"2025-09-09":1916.88,"2025-09-10":2485.27,"2025-09-11":2997.89,"2025-09-12":5810.91,"2025-09-13":5192.95,"2025-09-14":4042.08,"2025-09-15":1405.88,"2025-09-16":1927.22,"2025-09-17":2662.4,"2025-09-18":2263.23,"2025-09-19":5200.42,"2025-09-20":5067.6,"2025-09-21":4642.63,"2025-09-22":1777.64,"2025-09-23":1812.39,"2025-09-24":2081.37,"2025-09-25":2661.57,"2025-09-26":7173.05,"2025-09-27":4494.22,"2025-09-28":3239.76,"2025-09-29":2509.68,"2025-09-30":2289.99,"2025-10-01":2361.5,"2025-10-02":3501.33,"2025-10-03":8831.94,"2025-10-04":6211.49,"2025-10-05":2536.64,"2025-10-06":1751.18,"2025-10-07":1647.67,"2025-10-08":4019.07,"2025-10-09":5238.25,"2025-10-10":5857.09,"2025-10-11":5885.37,"2025-10-12":3009.88,"2025-10-13":2901.26,"2025-10-14":3164.21,"2025-10-15":2139.01,"2025-10-16":2881.1,"2025-10-17":6168.96,"2025-10-18":4371.56,"2025-10-19":3836.89,"2025-10-20":2054.73,"2025-10-21":2327.51,"2025-10-22":3556.72,"2025-10-23":4257.78,"2025-10-24":4577.49,"2025-10-25":5183.97,"2025-10-26":5059.51,"2025-10-27":2037.27,"2025-10-28":1790.69,"2025-10-29":3079.8,"2025-10-30":2563.44,"2025-10-31":10693.46,"2025-11-01":5482.01,"2025-11-02":3186.66,"2025-11-03":1775.4,"2025-11-04":4150.74,"2025-11-05":2489.09,"2025-11-06":3696.88,"2025-11-07":4779.07,"2025-11-08":5309.97,"2025-11-09":3227.37,"2025-11-10":1514.91,"2025-11-11":2387.67,"2025-11-12":2872.65,"2025-11-13":2969.1,"2025-11-14":6989.77,"2025-11-15":4559.78,"2025-11-16":3546.25,"2025-11-17":1351.95,"2025-11-18":1857.47,"2025-11-19":2656.37,"2025-11-20":3735.67,"2025-11-21":6343.32,"2025-11-22":6496.94,"2025-11-23":3965.4,"2025-11-24":2721.9,"2025-11-25":4063.25,"2025-11-26":6453.28,"2025-11-27":4598.05,"2025-11-28":5861.08,"2025-11-29":5212.53,"2025-11-30":3269.28,"2025-12-01":1918.82,"2025-12-02":1896.63,"2025-12-03":2503.29,"2025-12-04":4847.24,"2025-12-05":5996.76,"2025-12-06":5058.95,"2025-12-07":4111.54,"2025-12-08":2453.41,"2025-12-09":3208.15,"2025-12-10":1960.67,"2025-12-11":2458.17,"2025-12-12":15813.09,"2025-12-13":5839.33,"2025-12-14":3963.11,"2025-12-15":1945.88,"2025-12-16":3454.69,"2025-12-17":2870.84,"2025-12-18":3829.42,"2025-12-19":9018.84,"2025-12-20":6857.98,"2025-12-21":3600.08,"2025-12-22":3908.6,"2025-12-23":7373.08,"2025-12-24":7124.32,"2025-12-25":11092.56,"2025-12-26":4215.82,"2025-12-27":4335.11,"2025-12-28":3853.37,"2025-12-29":2865.87,"2025-12-30":4667.21,"2025-12-31":7115.97,"2026-01-01":3663.89,"2026-01-02":3717.18,"2026-01-03":4355.24,"2026-01-04":2758.11,"2026-01-05":2175.92,"2026-01-06":1857.78,"2026-01-07":1781.75,"2026-01-08":2802.01,"2026-01-09":5418.85,"2026-01-10":9013.91,"2026-01-11":2834.65,"2026-01-12":7261.11,"2026-01-13":1500.18,"2026-01-14":2008.92,"2026-01-15":2797.29,"2026-01-16":5550.13,"2026-01-17":4295.3,"2026-01-18":7854.14,"2026-01-19":1826.31,"2026-01-20":2055.71,"2026-01-21":1651.18,"2026-01-22":2358.98,"2026-01-23":5670.85,"2026-01-24":5359.34,"2026-01-25":3802.22,"2026-01-26":1983.06,"2026-01-27":2590.43,"2026-01-28":1659.78,"2026-01-29":3678.11,"2026-01-30":5250.12,"2026-01-31":5392.03,"2026-02-01":2793.22,"2026-02-02":2351.85,"2026-02-03":2522.12,"2026-02-04":2974.99,"2026-02-05":2628.63,"2026-02-06":7144.3,"2026-02-07":4597.6,"2026-02-08":10737.9,"2026-02-09":1846.87,"2026-02-10":2411.5,"2026-02-11":2173.24,"2026-02-12":2964.17,"2026-02-13":6209.47,"2026-02-14":5810.08,"2026-02-15":3038.04,"2026-02-16":2331.07,"2026-02-17":2817.39,"2026-02-18":2903.71,"2026-02-19":2839.79,"2026-02-20":5878.34,"2026-02-21":5635.23,"2026-02-22":3075.34,"2026-02-23":1507.52,"2026-02-24":2629.7,"2026-02-25":2815.79,"2026-02-26":2571.17,"2026-02-27":4990.5,"2026-02-28":5072.6,"2026-03-01":2587.45,"2026-03-02":1953.41,"2026-03-03":3078.49,"2026-03-04":2665.2,"2026-03-05":3404.92,"2026-03-06":6157.57,"2026-03-07":4751.67,"2026-03-08":4039.66,"2026-03-09":2314.41,"2026-03-10":2769.45,"2026-03-11":2211.82,"2026-03-12":4601.14,"2026-03-13":6274.71,"2026-03-14":6753.36,"2026-03-15":3419.26,"2026-03-16":2447.44,"2026-03-17":2356.52,"2026-03-18":2506.88,"2026-03-19":3743.48,"2026-03-20":7709.02,"2026-03-21":4827.99,"2026-03-22":2921.47,"2026-03-23":2544.59,"2026-03-24":3215.4,"2026-03-25":3090.21,"2026-03-26":3260.43,"2026-03-27":6079.67,"2026-03-28":4912.79,"2026-03-29":3204.7,"2026-03-30":2641.55,"2026-03-31":2841.33,"2026-04-01":3294.37,"2026-04-02":3538.05,"2026-04-03":5586.07,"2026-04-04":5347.82,"2026-04-05":3656.95,"2026-04-06":2404.45,"2026-04-07":2295.24,"2026-04-08":2343.39,"2026-04-09":3241.07,"2026-04-10":6675.46,"2026-04-11":6629.62,"2026-04-12":2962.29,"2026-04-13":2811.92,"2026-04-14":1507.12,"2026-04-15":2603.4,"2026-04-16":3355.93,"2026-04-17":6461.75,"2026-04-18":7235.16,"2026-04-19":3865.13,"2026-04-20":2813.3,"2026-04-21":3427.64,"2026-04-22":2334.98,"2026-04-23":3860.38,"2026-04-24":5365.32,"2026-04-25":6351.99,"2026-04-26":3320.62,"2026-04-27":2817.15,"2026-04-28":3094.57,"2026-04-29":3072.4,"2026-04-30":3082.15,"2026-05-01":6901.37,"2026-05-02":6164.85,"2026-05-03":3188.56,"2026-05-04":2215.31,"2026-05-05":2864.33,"2026-05-06":3312.27,"2026-05-07":4373.77,"2026-05-08":8093.54,"2026-05-09":5833.12,"2026-05-10":3753.74,"2026-05-11":2421.53,"2026-05-12":2345.79,"2026-05-13":3936.66,"2026-05-14":3474.42,"2026-05-15":9140.38,"2026-05-16":5301.22,"2026-05-17":4617.76,"2026-05-18":2195.79,"2026-05-19":2485.85,"2026-05-20":3673.78,"2026-05-21":3646.73,"2026-05-22":7291.62,"2026-05-23":5379.96,"2026-05-24":3820.48,"2026-05-25":3785.76,"2026-05-26":2659.61,"2026-05-27":3705.19,"2026-05-28":3217.09,"2026-05-29":6646.02,"2026-05-30":5328.95,"2026-05-31":4377.97,"2026-06-01":2399.99,"2026-06-02":3513.15,"2026-06-03":3176.18,"2026-06-04":3369.57,"2026-06-05":8081.34,"2026-06-06":4792.97,"2026-06-07":3689.57,"2026-06-08":3832.51,"2026-06-09":2871.45,"2026-06-10":3487.0,"2026-06-11":4346.71,"2026-06-12":7543.45,"2026-06-13":5626.76,"2026-06-14":3949.53,"2026-06-15":3726.95,"2026-06-16":2696.15,"2026-06-17":3119.65,"2026-06-18":4542.85,"2026-06-19":6516.28,"2026-06-20":5273.61,"2026-06-21":4779.19,"2026-06-22":2223.68,"2026-06-23":2748.43,"2026-06-24":2924.46,"2026-06-25":3963.26,"2026-06-26":6197.91,"2026-06-27":5350.34,"2026-06-28":4122.32,"2026-06-29":2942.52,"2026-06-30":3189.01,"2026-07-01":3486.43,"2026-07-02":6214.71,"2026-07-03":6914.79,"2026-07-04":9466.74,"2026-07-05":3124.44,"2026-07-06":2809.99,"2026-07-07":2407.38,"2026-07-08":2586.61,"2026-07-09":3872.72,"2026-07-10":6223.84,"2026-07-11":5689.37,"2026-07-12":4282.74,"2026-07-13":3401.63,"2026-07-14":3266.29,"2026-07-15":3695.9,"2026-07-16":4722.23,"2026-07-17":6237.71,"2026-07-18":6855.6,"2026-07-19":5040.12,"2026-07-20":2857.37,"2026-07-21":3625.77,"2026-07-22":3506.92,"2026-07-23":3960.94,"2026-07-24":8623.58,"2026-07-25":6178.97,"2026-07-26":5109.79,"2026-07-27":3305.74,"2026-07-28":3286.16,"2026-07-29":4026.97,"2026-07-30":4715.81,"2026-07-31":7754.61,"2026-08-01":6108.76,"2026-08-02":3900.93,"2026-08-03":3527.17,"2026-08-04":3433.36,"2026-08-05":3110.35,"2026-08-06":5008.3,"2026-08-07":7061.84,"2026-08-08":6506.22,"2026-08-09":3900.94,"2026-08-10":3931.02,"2026-08-11":3880.81,"2026-08-12":3251.06,"2026-08-13":4907.13,"2026-08-14":7742.75,"2026-08-15":5757.43,"2026-08-16":4700.0,"2026-08-17":2128.23,"2026-08-18":3319.32,"2026-08-19":2841.09,"2026-08-20":3881.8,"2026-08-21":6908.43,"2026-08-22":8113.32,"2026-08-23":3717.39,"2026-08-24":2042.08,"2026-08-25":2955.96,"2026-08-26":3800.39,"2026-08-27":5219.16,"2026-08-28":7869.31};
+const $=(s,el=document)=>el.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,10);
+const DAYS=['sun','mon','tue','wed','thu','fri','sat'];
+const DAYL={sun:'Sun',mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sat'};
+const ymd=d=>{const x=d?new Date(d):new Date();return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');};
+const todayKey=()=>ymd();
+const nowT=()=>new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+const fmtDate=k=>{const [y,m,d]=k.split('-');return new Date(y,m-1,d).toLocaleDateString([], {weekday:'long',month:'short',day:'numeric'});};
+const weekdayOf=k=>{const [y,m,d]=k.split('-');return DAYS[new Date(y,m-1,d).getDay()];};
+const money=n=>'$'+(Math.round(n*100)/100).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+const money0=n=>'$'+Math.round(n).toLocaleString();
+const clamp0=n=>Math.max(0,n);
+let toastTimer=null;
+function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.remove(),2200);}
+
+/* ---------------- persistence (v7: slim payloads, serialized saves, device sync) ---------------- */
+const STORE_KEY='rosatis-par-v2';
+let memFallback=null;
+/* Firestore cloud backend (project rosatis-prep) — one shared board for every phone */
+const FS_KEY='AIzaSyCQP03TPU9ayBGPJ98cIeBsMQ7vJ9njyRU';
+const FS_DOC='https://firestore.googleapis.com/v1/projects/rosatis-prep/databases/(default)/documents/stores/stc/app/state';
+let fsOnline=null; /* null=unknown, true/false after first contact */
+function localGet(){try{return localStorage.getItem(STORE_KEY);}catch(e){return null;}}
+function localSet(str){try{localStorage.setItem(STORE_KEY,str);}catch(e){}}
+async function backendGet(){
+  try{
+    const r=await fetch(FS_DOC+'?key='+FS_KEY,{cache:'no-store'});
+    if(r.status===404){fsOnline=true;return localGet();} /* cloud empty (first ever run) */
+    if(!r.ok)throw new Error('fs read '+r.status);
+    const d=await r.json();fsOnline=true;
+    const j=d.fields&&d.fields.json&&d.fields.json.stringValue;
+    if(j){const loc=localGet();
+      /* prefer whichever is newer so an offline phone doesn't lose its work */
+      try{const rj=JSON.parse(j),lj=loc?JSON.parse(loc):null;
+        if(lj&&(lj.rev||0)>(rj.rev||0))return loc;}catch(e){}
+      localSet(j);return j;}
+    return localGet();
+  }catch(e){fsOnline=false;return localGet();}
+}
+async function backendSet(str){
+  localSet(str); /* cache locally first — instant boot, offline safety */
+  const body=JSON.stringify({fields:{
+    json:{stringValue:str},
+    rev:{integerValue:String(S.rev||0)},
+    updatedAt:{stringValue:S.updatedAt||''}}});
+  const r=await fetch(FS_DOC+'?key='+FS_KEY,{method:'PATCH',headers:{'Content-Type':'application/json'},body});
+  if(!r.ok)throw new Error('fs write '+r.status);
+  fsOnline=true;return true;
+}
+async function loadState(){
+  for(let i=0;i<3;i++){
+    try{ const v=await backendGet(); return v?JSON.parse(v):memFallback;
+    }catch(e){ if(i<2)await new Promise(z=>setTimeout(z,800*(i+1))); }
+  }
+  return memFallback;
+}
+/* store only what can't be rebuilt: sales diffs vs embedded history, last 60 days of boards, trimmed logs */
+function packState(){
+  const cutoff=ymd(new Date(Date.now()-60*86400000));
+  const sales={};Object.keys(S.sales).forEach(k=>{if(EMBEDDED_SALES[k]!==S.sales[k])sales[k]=S.sales[k];});
+  const days={};Object.keys(S.days).forEach(k=>{if(k>=cutoff)days[k]=S.days[k];});
+  return {...S,sales,days,
+    audit:S.audit.slice(0,250),
+    waste:S.waste.filter(w=>w.date>=cutoff),
+    shortages:S.shortages.filter(x=>x.date>=cutoff||!x.resolved)};
+}
+let saveTimer=null,saving=false,dirty=false,failCount=0,wasOffline=false;
+function saveState(){ memFallback=S; dirty=true;
+  clearTimeout(saveTimer); saveTimer=setTimeout(doSave,900);
+}
+async function doSave(){
+  if(!dirty||saving)return;
+  saving=true;
+  try{
+    S.rev=(S.rev||0)+1;S.updatedAt=new Date().toISOString();
+    const ok=await backendSet(JSON.stringify(packState()));
+    if(!ok){saving=false;dirty=false;return;} /* no backend at all: memory-only session */
+    dirty=false;failCount=0;
+    if(wasOffline){wasOffline=false;toast('✓ Back in sync');}
+  }catch(e){
+    failCount++;
+    if(failCount===5){wasOffline=true;toast('Working offline — will sync automatically');}
+    clearTimeout(saveTimer);
+    saveTimer=setTimeout(()=>{saving=false;doSave();},Math.min(2000*failCount,15000)+Math.random()*1000);
+    saving=false;
+    return;
+  }
+  saving=false;
+  if(dirty){clearTimeout(saveTimer);saveTimer=setTimeout(doSave,900);}
+}
+/* pull fresh state written by other phones, when this one is idle */
+function adoptRemote(remote){
+  if(!remote||dirty||saving)return;
+  if(!S||(remote.rev||0)>(S.rev||0)){S=remote;memFallback=S;migrate();ensureToday();render();}
+}
+async function syncPull(){
+  if(dirty||saving||!S||ui.sheet||document.visibilityState==='hidden')return;
+  try{
+    const v=await backendGet();
+    if(v)adoptRemote(JSON.parse(v));
+  }catch(e){}
+}
+/* REST backend has no push; poll a bit faster while the tab is visible */
+async function liveSync(){
+  setInterval(()=>{if(document.visibilityState==='visible')syncPull();},15000);
+}
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='hidden'&&dirty)doSave();
+  if(document.visibilityState==='visible')syncPull();
+});
+
+/* ---------------- holiday engine ---------------- */
+/* nth weekday helpers */
+function nthWeekday(y,m,dow,n){ // m 0-11, dow 0-6, n 1-based
+  const first=new Date(y,m,1); let d=1+((dow-first.getDay())+7)%7; d+=(n-1)*7; return new Date(y,m,d);
+}
+function lastWeekday(y,m,dow){
+  const last=new Date(y,m+1,0); let d=last.getDate()-((last.getDay()-dow)+7)%7; return new Date(y,m,d);
+}
+function floatDate(y,key){
+  switch(key){
+    case 'memorial': return lastWeekday(y,4,1);           // last Mon May
+    case 'labor':    return nthWeekday(y,8,1,1);          // 1st Mon Sep
+    case 'thanksgiving': return nthWeekday(y,10,4,4);     // 4th Thu Nov
+    case 'blackout': {const t=nthWeekday(y,10,4,4);t.setDate(t.getDate()-1);return t;} // Wed before
+    default: return null;
+  }
+}
+function defaultHolidays(){
+  return [
+    {id:uid(),name:"New Year's Eve",type:'fixed',m:12,d:31,mult:1.4},
+    {id:uid(),name:"New Year's Day",type:'fixed',m:1,d:1,mult:1.2},
+    {id:uid(),name:'Memorial Day',type:'float',key:'memorial',mult:1.3},
+    {id:uid(),name:'July 4th',type:'fixed',m:7,d:4,mult:1.35},
+    {id:uid(),name:'Labor Day',type:'float',key:'labor',mult:1.3},
+    {id:uid(),name:'Halloween',type:'fixed',m:10,d:31,mult:1.3},
+    {id:uid(),name:'Blackout Wednesday',type:'float',key:'blackout',mult:1.4},
+    {id:uid(),name:'Thanksgiving',type:'float',key:'thanksgiving',mult:1.25},
+    {id:uid(),name:'Christmas Eve',type:'fixed',m:12,d:24,mult:1.3},
+    {id:uid(),name:'Christmas Day',type:'fixed',m:12,d:25,mult:1.25},
+    {id:uid(),name:'Pi Day',type:'fixed',m:3,d:14,mult:1.2},
+    {id:uid(),name:'Super Bowl',type:'date',date:'2026-02-08',mult:2.85},
+  ];
+}
+function holidayFor(k){
+  const [y,m,d]=k.split('-').map(Number);
+  for(const h of S.holidays){
+    if(h.type==='fixed'&&h.m===m&&h.d===d)return h;
+    if(h.type==='float'){const dt=floatDate(y,h.key);if(dt&&ymd(dt)===k)return h;}
+    if(h.type==='date'&&h.date===k)return h;
+  }
+  return null;
+}
+/* learn multiplier for a holiday from sales history: holiday sales / weekday avg */
+function learnedMult(h){
+  const dates=Object.keys(S.sales);
+  const hits=[];
+  dates.forEach(k=>{const [y,m,d]=k.split('-').map(Number);
+    let match=false;
+    if(h.type==='fixed'&&h.m===m&&h.d===d)match=true;
+    if(h.type==='float'){const dt=floatDate(y,h.key);if(dt&&ymd(dt)===k)match=true;}
+    if(h.type==='date'&&h.date===k)match=true;
+    if(match)hits.push(k);
+  });
+  if(!hits.length)return null;
+  const ratios=hits.map(k=>{
+    const wd=weekdayOf(k);
+    const peers=dates.filter(x=>weekdayOf(x)===wd&&!holidayFor(x));
+    if(peers.length<4)return null;
+    const avg=peers.reduce((a,x)=>a+S.sales[x],0)/peers.length;
+    return avg>0?S.sales[k]/avg:null;
+  }).filter(Boolean);
+  if(!ratios.length)return null;
+  return Math.round((ratios.reduce((a,b)=>a+b,0)/ratios.length)*100)/100;
+}
+
+/* ---------------- sales forecast + usage learning ---------------- */
+function salesForecast(k){
+  const wd=weekdayOf(k);
+  const dates=Object.keys(S.sales).filter(x=>x<k&&weekdayOf(x)===wd&&!holidayFor(x)).sort().slice(-8);
+  if(dates.length<2)return null;
+  const base=dates.reduce((a,x)=>a+S.sales[x],0)/dates.length;
+  const h=holidayFor(k);
+  return {base,mult:h?(learnedMult(h)||h.mult):1,holiday:h,proj:base*(h?(learnedMult(h)||h.mult):1)};
+}
+/* usage for a past day: start + made - nextDayStart; needs both opening counts */
+function usageLog(itemId){
+  const keys=Object.keys(S.days).sort();
+  const out=[];
+  for(let i=0;i<keys.length-1;i++){
+    const k=keys[i],k2=keys[i+1];
+    const d1=new Date(k),d2=new Date(k2);
+    if((d2-d1)/86400000!==1)continue; // must be consecutive
+    const e1=S.days[k].entries.find(e=>e.itemId===itemId);
+    const e2=S.days[k2].entries.find(e=>e.itemId===itemId);
+    if(!e1||!e2||e1.current==null||e2.current==null)continue;
+    const made=e1.status==='completed'?(e1.qty||0):0;
+    const used=clamp0(e1.current+made-e2.current);
+    out.push({day:k,used,sales:S.sales[k]||null});
+  }
+  return out;
+}
+function usageRate(itemId){ // units per $1000, recency-weighted
+  const log=usageLog(itemId).filter(x=>x.sales&&x.sales>0).slice(-28);
+  if(log.length<3)return null;
+  let wsum=0,vsum=0;
+  log.forEach((x,i)=>{const w=i+1;wsum+=w;vsum+=w*(x.used/(x.sales/1000));});
+  return vsum/wsum;
+}
+function suggestedPar(itemId,k){
+  const f=salesForecast(k), r=usageRate(itemId);
+  if(!f||!r)return null;
+  const it=item(itemId);
+  let rec=f.proj/1000*r*1.1;
+  if(it.batch>1)rec=Math.ceil(rec/it.batch)*it.batch; else rec=Math.ceil(rec);
+  return {rec,proj:f.proj,rate:r};
+}
+
+/* ---------------- seed ---------------- */
+function seed(){
+  const items=[
+    {id:uid(),name:"Dough",cat:'Pizza Prep',unit:'trays',par:{mon:9,tue:9,wed:10,thu:12,fri:16,sat:14,sun:11},batch:3,shelf:'',station:'Pizza Prep',shift:'Midday',prio:'critical',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Sauce",cat:'Pizza Prep',unit:'buckets',par:{mon:3,tue:3,wed:4,thu:4,fri:6,sat:4,sun:3},batch:1,shelf:'',station:'Pizza Prep',shift:'Opening',prio:'critical',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Cheese",cat:'Pizza Prep',unit:'tubs',par:{mon:12,tue:12,wed:12,thu:16,fri:20,sat:20,sun:16},batch:4,shelf:'',station:'Pizza Prep',shift:'Opening',prio:'critical',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Canadian Bacon",cat:'Meats',unit:'1/6 pans',par:{mon:2,tue:2,wed:3,thu:3,fri:4,sat:3,sun:3},batch:2,shelf:'',station:'Meats',shift:'Opening',prio:'high',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Chicken",cat:'Meats',unit:'1/3 pans',par:{mon:2,tue:2,wed:2,thu:2,fri:3,sat:2,sun:2},batch:2,shelf:'',station:'Meats',shift:'Opening',prio:'high',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Cooked Sausage",cat:'Meats',unit:'1/3 pans',par:{mon:1,tue:1,wed:1,thu:1,fri:1,sat:1,sun:1},batch:2,shelf:'',station:'Meats',shift:'Opening',prio:'high',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Bacon",cat:'Meats',unit:'1/6 pans',par:{mon:2,tue:2,wed:3,thu:3,fri:4,sat:3,sun:3},batch:2,shelf:'',station:'Meats',shift:'Opening',prio:'normal',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Green Pepper",cat:'Veggies',unit:'1/3 pans',par:{mon:3,tue:3,wed:4,thu:4,fri:6,sat:5,sun:3},batch:1,shelf:'',station:'Veggies',shift:'Opening',prio:'normal',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Onion",cat:'Veggies',unit:'1/3 pans',par:{mon:2,tue:3,wed:3,thu:4,fri:5,sat:4,sun:2},batch:1,shelf:'',station:'Veggies',shift:'Opening',prio:'normal',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Garlic",cat:'Veggies',unit:'1/6 pans',par:{mon:1,tue:1,wed:1,thu:2,fri:2,sat:2,sun:1},batch:1,shelf:'',station:'Veggies',shift:'Opening',prio:'normal',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Tomato",cat:'Veggies',unit:'1/3 pans',par:{mon:2,tue:2,wed:2,thu:2,fri:3,sat:2,sun:2},batch:1,shelf:'',station:'Veggies',shift:'Opening',prio:'normal',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Red Onion",cat:'Veggies',unit:'1/6 pans',par:{mon:1,tue:1,wed:1,thu:1,fri:2,sat:1,sun:1},batch:1,shelf:'',station:'Veggies',shift:'Opening',prio:'normal',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Alfredo Sauce",cat:'Kitchen',unit:'1/3 pans',par:{mon:2,tue:2,wed:2,thu:2,fri:2,sat:2,sun:2},batch:2,shelf:'',station:'Kitchen',shift:'Opening',prio:'normal',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Garlic Spread",cat:'Kitchen',unit:'1/2 pans',par:{mon:1,tue:1,wed:1,thu:1,fri:1,sat:1,sun:1},batch:1,shelf:'',station:'Kitchen',shift:'Opening',prio:'normal',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Marinara Sauce",cat:'Kitchen',unit:'buckets',par:{mon:1,tue:1,wed:1,thu:2,fri:2,sat:2,sun:1},batch:2,shelf:'',station:'Kitchen',shift:'Opening',prio:'normal',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Hot Sauce",cat:'Kitchen',unit:'buckets',par:{mon:1,tue:1,wed:1,thu:1,fri:1,sat:1,sun:1},batch:1,shelf:'',station:'Kitchen',shift:'Opening',prio:'normal',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Lasagna (defrosted)",cat:'Kitchen',unit:'pcs',par:{mon:6,tue:6,wed:6,thu:6,fri:6,sat:6,sun:6},batch:1,shelf:'',station:'Kitchen',shift:'Opening',prio:'normal',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Mostaccioli",cat:'Kitchen',unit:'1/3 pans',par:{mon:1,tue:1,wed:1,thu:1,fri:2,sat:1,sun:1},batch:2,shelf:'',station:'Kitchen',shift:'Opening',prio:'normal',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Fettucine",cat:'Kitchen',unit:'1/3 pans',par:{mon:1,tue:1,wed:1,thu:1,fri:2,sat:1,sun:1},batch:2,shelf:'',station:'Kitchen',shift:'Opening',prio:'normal',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Spaghetti",cat:'Kitchen',unit:'1/3 pans',par:{mon:1,tue:1,wed:1,thu:1,fri:2,sat:1,sun:1},batch:2,shelf:'',station:'Kitchen',shift:'Opening',prio:'normal',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Green Onion",cat:'Kitchen',unit:'1/9 pans',par:{mon:1,tue:1,wed:1,thu:1,fri:1,sat:1,sun:1},batch:1,shelf:'',station:'Kitchen',shift:'Opening',prio:'low',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Red Onion (Kitchen)",cat:'Kitchen',unit:'1/9 pans',par:{mon:1,tue:1,wed:1,thu:1,fri:1,sat:1,sun:1},batch:1,shelf:'',station:'Kitchen',shift:'Opening',prio:'low',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Chicken Breast",cat:'Kitchen',unit:'1/2 pans',par:{mon:1,tue:1,wed:1,thu:2,fri:2,sat:2,sun:1},batch:2,shelf:'',station:'Kitchen',shift:'Opening',prio:'high',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Chicken Wings",cat:'Kitchen',unit:'tubs',par:{mon:1,tue:1,wed:1,thu:1,fri:2,sat:1,sun:1},batch:2,shelf:'',station:'Kitchen',shift:'Opening',prio:'critical',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Ribs (defrosted)",cat:'Kitchen',unit:'1/2 slabs',par:{mon:6,tue:6,wed:7,thu:7,fri:8,sat:7,sun:6},batch:1,shelf:'',station:'Kitchen',shift:'Opening',prio:'high',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Ranch",cat:'Kitchen',unit:'buckets',par:{mon:1,tue:1,wed:1,thu:2,fri:2,sat:2,sun:1},batch:1,shelf:'',station:'Kitchen',shift:'Opening',prio:'normal',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Italian",cat:'Kitchen',unit:'buckets',par:{mon:1,tue:1,wed:1,thu:1,fri:1,sat:1,sun:1},batch:1,shelf:'',station:'Kitchen',shift:'Opening',prio:'normal',prepMin:15,cost:0,active:true,demo:false,notes:''},
+    {id:uid(),name:"Blue Cheese",cat:'Kitchen',unit:'1/2 pans',par:{mon:1,tue:1,wed:1,thu:1,fri:1,sat:1,sun:1},batch:1,shelf:'',station:'Kitchen',shift:'Opening',prio:'normal',prepMin:15,cost:0,active:true,demo:false,notes:''},
+  ];
+  const users=[
+    {id:uid(),name:'Imran'},
+    {id:uid(),name:'Marcelino'},
+    {id:uid(),name:'Juan'},
+    {id:uid(),name:'Josue'},
+  ];
+  return {v:2,location:"Rosati's St. Charles — Kirk Rd",users,items,days:{},waste:[],shortages:[],audit:[],
+    sales:{}, holidays:defaultHolidays(), cleanTasks:defaultCleanTasks(),
+    settings:{dueTimes:{Opening:'11:00',Midday:'13:00',Dinner:'18:00',Closing:'23:00'},buffer:1.1}};
+}
+
+function defaultCleanTasks(){
+  return [
+    ['Wipe prep tables & cutting boards','Opening'],
+    ['Sanitize walk-in handles & shelves','Opening'],
+    ['Clean dough mixer after dough make','Midday'],
+    ['Clean pizza cutters & utensils','Midday'],
+    ['Wipe oven doors & front line','Dinner'],
+    ['Restock & wipe sauce station','Dinner'],
+    ['Sweep & mop kitchen floor','Closing'],
+    ['Empty trash & replace liners','Closing'],
+    ['Clean dish sink & drying rack','Closing'],
+  ].map(([name,shift])=>({id:uid(),name,shift,active:true}));
+}
+/* ---------------- state ---------------- */
+let S=null, me=null;
+let ui={view:'prep',pinFor:null,pin:'',cat:'All',mine:false,sheet:null,range:30,edit:null};
+
+function user(id){return S.users.find(u=>u.id===id);}
+function item(id){return S.items.find(i=>i.id===id);}
+function log(action){S.audit.unshift({at:new Date().toISOString(),by:me?me.id:null,action});S.audit=S.audit.slice(0,500);}
+
+function ensureToday(){
+  const k=todayKey(), wd=weekdayOf(k);
+  if(!S.days[k]){
+    const h=holidayFor(k);
+    const mult=h?(learnedMult(h)||h.mult):1;
+    S.days[k]={entries:S.items.filter(i=>i.active).map(it=>{
+      const base=it.par[wd];
+      const par=h?Math.ceil(base*mult):base;
+      return {id:uid(),itemId:it.id,par,parBase:base,override:null,holiday:h?{name:h.name,mult}:null,
+        current:null,assignedTo:null,status:'not_started',emergency:false,
+        startedAt:null,startedBy:null,completedAt:null,completedBy:null,late:false,qty:null,notes:''};
+    }),clean:{},closed:false,closedBy:null,closedAt:null};
+    if(h)log(`Holiday PARs applied: ${h.name} ×${mult}`);
+    saveState();
+  }
+}
+function today(){ensureToday();return S.days[todayKey()];}
+
+/* ---------------- core calcs ---------------- */
+function makeQty(e){ if(e.par<=0)return null; if(e.current==null)return undefined; return clamp0(e.par-e.current); }
+function batchPlan(e){
+  const it=item(e.itemId), mkq=makeQty(e);
+  if(!mkq||!it.batch||it.batch<=1)return null;
+  const n=Math.ceil(mkq/it.batch);
+  return {n,expected:n*it.batch};
+}
+function dueTimeFor(e){const it=item(e.itemId);return (S.settings.dueTimes[it.shift]||'23:00');}
+function isOverdue(e){
+  if(e.status==='completed')return false;
+  const mkq=makeQty(e); if(!mkq)return false;
+  const [h,m]=dueTimeFor(e).split(':').map(Number);
+  const now=new Date(); return now.getHours()*60+now.getMinutes()>h*60+m;
+}
+function statusOf(e){
+  if(e.status==='completed')return {k:'done',label:'Complete',cls:'green'};
+  if(e.par<=0)return {k:'nopar',label:'Needs PAR',cls:'gray'};
+  if(isOverdue(e))return {k:'overdue',label:'Overdue',cls:'red'};
+  if(e.status==='in_progress')return {k:'progress',label:'In progress',cls:'yellow'};
+  if(makeQty(e)===0)return {k:'ok',label:'At PAR',cls:'green'};
+  if(e.current==null)return {k:'count',label:'Count needed',cls:'yellow'};
+  return {k:'todo',label:'Not started',cls:'gray'};
+}
+
+/* ---------------- render ---------------- */
+function render(){
+  const app=$('#app');
+  if(!S){app.innerHTML='<div class="login"><div class="logo-lockup"><div class="mark">R</div><h1>Rosati\'s Prep</h1><p>Loading…</p></div></div>';return;}
+  const views={prep:viewPrep,alerts:viewAlerts,dash:viewDash,waste:viewWaste,reports:viewReports,admin:viewAdmin};
+  app.innerHTML=(views[ui.view]||viewPrep)()+navHtml()+(ui.sheet?sheetHtml():'');
+  bind();
+}
+function navHtml(){
+  const t=today();
+  const alerts=S.shortages.filter(s=>!s.resolved).length+t.entries.filter(isOverdue).length
+    +t.entries.filter(e=>e.status==='completed'&&e.current!=null&&e.par>0&&e.current<0.35*e.par).length;
+  const tabs=[['prep','🔥','Prep'],['dash','📊','Today'],['waste','🗑','Waste'],['alerts','⚠️','Alerts'],['reports','📈','PARs'],['admin','⚙️','Setup']];
+  return `<div id="nav">${tabs.map(([k,ic,l])=>`
+    <button data-nav="${k}" class="${ui.view===k?'on':''}"><span class="ic">${ic}</span>${l}
+    ${k==='alerts'&&alerts?`<span class="badge">${alerts}</span>`:''}</button>`).join('')}</div>`;
+}
+function topbar(title,sub){
+  return `<div class="topbar"><div class="brandline"><div class="brandmark">R</div><div>
+    <h1>${esc(title)}</h1><div class="sub">${esc(sub||S.location)}</div></div></div>
+    <button class="iconbtn" data-sheet="who" data-id="" title="Switch cook" style="width:auto;padding:0 12px;font-size:15px;font-weight:700">👤 ${esc(me.name)}</button></div>`;
+}
+
+/* ---------------- PREP ---------------- */
+function viewPrep(){
+  const t=today();
+  const hour=new Date().getHours();
+  const greet=hour<11?'Good morning':hour<16?'Good afternoon':'Good evening';
+  const cats=['All','Pizza Prep','Meats','Veggies','Kitchen','🧽 Clean'];
+  let entries=t.entries.slice();
+  if(ui.cat==='🧽 Clean')entries=[];
+  else if(ui.cat!=='All')entries=entries.filter(e=>item(e.itemId).cat===ui.cat);
+  if(ui.mine)entries=entries.filter(e=>e.assignedTo===me.id);
+  const prioRank={critical:0,high:1,normal:2,low:3};
+  const stRank={overdue:0,progress:1,count:2,todo:2,ok:2,done:2,nopar:3};
+  entries.sort((a,b)=>{const sa=stRank[statusOf(a).k]-stRank[statusOf(b).k];if(sa)return sa;
+    return prioRank[item(a.itemId).prio]-prioRank[item(b.itemId).prio];});
+  const workable=t.entries.filter(e=>e.par>0);
+  const doneN=workable.filter(e=>e.status==='completed'||makeQty(e)===0).length;
+  const pct=workable.length?Math.round(doneN/workable.length*100):0;
+  const f=salesForecast(todayKey());
+  const h=holidayFor(todayKey());
+  return topbar(`${greet}, ${me.name}`,fmtDate(todayKey()))+`
+  <div class="screen">
+    ${h?`<div class="holidaybanner"><b>🎉 ${esc(h.name)}</b><div class="s">Busier than a normal ${fmtDate(todayKey()).split(',')[0]}${f?` — projected ${money0(f.proj)}`:''} · PARs raised ×${(learnedMult(h)||h.mult)}</div></div>`:''}
+    ${t.closed?`<div class="okbox">✅ Today's prep is closed out.</div>`:''}
+    <div class="card" style="padding:12px 14px">
+      <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase">
+        <span>Today's prep</span><span style="color:var(--gold-lt)">${pct}% done</span></div>
+      <div class="progressbar"><i style="width:${pct}%"></i></div>
+      <div style="font-size:14px;color:var(--txt3)">${doneN} of ${workable.length} items complete${f&&!h?` · projected sales ${money0(f.proj)}`:''}</div>
+      <div style="font-size:14px;color:var(--gold-lt);margin-top:6px;font-weight:600">🥶 Count the WALK-IN COOLER only — never what's already stocked on the line.</div>
+    </div>
+    <div class="chips">${cats.map(c=>`<button class="chip ${ui.cat===c?'on':''}" data-cat="${c}">${c}</button>`).join('')}
+      <button class="chip ${ui.mine?'on':''}" data-act="mine">Mine</button></div>
+    ${ui.cat==='🧽 Clean'?cleanBoard(t):entries.length?entries.map(prepCard).join(''):'<p class="notice">Nothing here. Change the category filter or turn off "Mine."</p>'}
+    ${!t.closed?`<button class="btn ghost" style="width:100%;margin-top:6px" data-act="emergency">+ Add emergency prep</button>`:''}
+  </div>`;
+}
+function prepCard(e){
+  const it=item(e.itemId), st=statusOf(e), mkq=makeQty(e), bp=batchPlan(e);
+  const a=e.assignedTo?user(e.assignedTo):null;
+  const canWork=!today().closed;
+  const low=e.status==='completed'&&e.current!=null&&e.par>0&&e.current<0.35*e.par;
+  const cls=`prepcard p-${it.prio} ${st.k==='done'||st.k==='ok'?'s-done':''} ${st.k==='progress'?'s-progress':''}`;
+  let makeCell;
+  if(e.status==='completed')makeCell='<div class="v">✓ 0</div>';
+  else if(mkq===null)makeCell='<div class="v">SET PAR</div>';
+  else if(mkq===undefined)makeCell='<div class="v">COUNT<br>WALK-IN</div>';
+  else if(mkq===0)makeCell='<div class="v">✓ 0</div>';
+  else makeCell=`<div class="v">${mkq}</div>`;
+  return `<div class="${cls}">
+    <div class="pc-top"><div>
+      <div class="pc-name">${esc(it.name)}</div>
+      <div class="pc-meta">${esc(it.cat)} · due ${dueTimeFor(e)}${it.prio==='critical'?' · 🔴 CRITICAL':it.prio==='high'?' · 🟠 HIGH':''}</div>
+    </div><span class="pill ${st.cls}">${st.label}</span></div>
+    <div class="pc-nums">
+      <div class="pc-num"><div class="k">PAR</div><div class="v">${e.par>0?e.par:'—'}${e.override?'<span style="font-size:12px;color:var(--gold-lt)">*</span>':''}${e.holiday&&!e.override?'<span style="font-size:12px;color:var(--gold-lt)">🎉</span>':''}</div></div>
+      <div class="pc-num"><div class="k">Walk-in</div>
+        ${canWork?`<input class="onhand ${e.current==null?'empty':''}" type="number" inputmode="decimal" placeholder="?" value="${e.current??''}" data-oh="${e.id}">`:`<div class="v">${e.current??'—'}</div>`}
+      </div>
+      <div class="pc-num make ${mkq===0?'zero':''} ${mkq===undefined?'uncounted':''} ${mkq===null?'nopar':''}">
+        <div class="k">Make</div>${makeCell}<div class="u">${esc(it.unit||'')}</div></div>
+    </div>
+    ${bp?`<div class="batchline">Prep <b>${bp.n} batch${bp.n>1?'es':''}</b> of ${it.batch} ${esc(it.unit)} → expected <b>${bp.expected} ${esc(it.unit)}</b></div>`:''}
+    ${e.override?`<div style="font-size:13.5px;color:var(--gold-lt);margin-bottom:8px">* Today's PAR ${e.override.from} → ${e.override.to} by ${esc(user(e.override.by)?.name||'?')} at ${e.override.at}</div>`:''}
+    ${low?`<div class="warnbox" style="margin-bottom:8px;padding:8px 11px;display:flex;align-items:center;justify-content:space-between;gap:10px"><span>🔻 Running low — under 35% of PAR.</span><button class="btn go sm" data-act="makemore" data-id="${e.id}" style="flex-shrink:0">Make more</button></div>`:''}
+    ${e.status==='completed'?`<div style="font-size:14.5px;color:var(--txt3);margin-bottom:6px">Made ${e.qty??'—'} ${esc(it.unit)} · ${esc(user(e.completedBy)?.name||'')} · ${e.completedAt?e.completedAt.slice(11):''}${e.notes?` · “${esc(e.notes)}”`:''}</div>`:''}
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:${canWork&&e.status!=='completed'&&mkq>0?'10px':'0'}">
+      <span class="assignchip ${e.assignedTo===me.id?'me':''}">${a?'👤 '+esc(a.name):'Open'}</span>
+      ${!today().closed?`<button class="linklike" data-sheet="override" data-id="${e.id}" style="font-size:14px">PAR</button>`:''}
+    </div>
+    ${canWork&&e.status!=='completed'&&mkq>0?`<div class="pc-actions">
+      ${e.status==='not_started'?`<button class="btn primary" data-act="start" data-id="${e.id}">▶ Start</button>`:''}
+      ${e.status==='in_progress'?`<button class="btn go" data-sheet="complete" data-id="${e.id}">✓ Complete</button>`:''}
+      <button class="btn ghost sm" data-sheet="waste" data-id="${e.id}">Waste</button>
+      <button class="btn ghost sm" data-sheet="short" data-id="${e.id}">⚠️</button>
+    </div>`:''}
+  </div>`;
+}
+
+function cleanBoard(t){
+  const tasks=S.cleanTasks.filter(c=>c.active);
+  if(!tasks.length)return '<p class="notice">No cleaning tasks yet. Add them in Setup.</p>';
+  const shifts=['Opening','Midday','Dinner','Closing'];
+  return shifts.map(sh=>{
+    const list=tasks.filter(c=>c.shift===sh);
+    if(!list.length)return '';
+    return `<div class="sechead">${sh}</div>`+list.map(c=>{
+      const d=t.clean[c.id];
+      return `<div class="prepcard ${d?'s-done':''}" style="border-left-color:${d?'var(--green)':'var(--gray)'};display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <div><div style="font-weight:700;font-size:17.5px">${d?'✅ ':''}${esc(c.name)}</div>
+        ${d?`<div style="font-size:14px;color:var(--txt3)">${esc(user(d.by)?.name||'')} · ${esc(d.at)}</div>`:''}</div>
+        ${!t.closed?`<button class="btn ${d?'ghost':'go'} sm" data-act="cleantoggle" data-id="${c.id}">${d?'Undo':'Done'}</button>`:''}
+      </div>`;}).join('');
+  }).join('');
+}
+/* ---------------- ALERTS ---------------- */
+function viewAlerts(){
+  const t=today();
+  const shorts=S.shortages.filter(s=>!s.resolved);
+  const over=t.entries.filter(isOverdue);
+  const lows=t.entries.filter(e=>e.status==='completed'&&e.current!=null&&e.par>0&&e.current<0.35*e.par);
+  return topbar('Alerts')+`<div class="screen">
+    ${!shorts.length&&!over.length&&!lows.length?'<p class="notice">All clear. No shortages, low stock, or overdue prep.</p>':''}
+    ${lows.length?`<div class="sechead">Running low (recount below 35% of PAR)</div>`:''}
+    ${lows.map(e=>{const it=item(e.itemId);return `<div class="card" style="border-left:5px solid var(--gold)">
+      <b style="font-size:18px">🔻 ${esc(it.name)}</b>
+      <div style="font-size:15px;color:var(--txt2)">Walk-in ${e.current} of PAR ${e.par} ${esc(it.unit)} — consider another batch</div>
+    </div>`;}).join('')}
+    ${shorts.length?`<div class="sechead">Shortages</div>`:''}
+    ${shorts.map(s=>{const it=item(s.itemId);return `<div class="card alertcard">
+      <div style="display:flex;justify-content:space-between"><b style="font-size:18px">⚠️ ${esc(it?it.name:'Item')}</b>
+      <span style="color:var(--txt3);font-size:14px">${esc(s.date===todayKey()?s.time:s.date)}</span></div>
+      <div style="margin:6px 0;font-size:16px">Current: <b>${s.current}</b> · Need: <b style="color:#FF7A87">${s.need}</b> ${it?esc(it.unit):''}</div>
+      ${s.note?`<div style="color:var(--txt2);font-size:15px">“${esc(s.note)}”</div>`:''}
+      <div style="color:var(--txt3);font-size:14px;margin-top:4px">Reported by ${esc(user(s.by)?.name||'?')}</div>
+      <button class="btn ghost sm" style="margin-top:10px" data-act="resolve" data-id="${s.id}">Mark resolved</button>
+    </div>`;}).join('')}
+    ${over.length?`<div class="sechead">Overdue prep</div>`:''}
+    ${over.map(e=>{const it=item(e.itemId);return `<div class="card alertcard">
+      <b style="font-size:18px">${esc(it.name)}</b>
+      <div style="font-size:15px;color:var(--txt2)">Due ${dueTimeFor(e)} · Make ${makeQty(e)??'?'} ${esc(it.unit)} · ${e.assignedTo?esc(user(e.assignedTo).name):'Unassigned'}</div>
+    </div>`;}).join('')}
+  </div>`;
+}
+
+/* ---------------- DASHBOARD ---------------- */
+function dayStats(day){
+  const es=day.entries.filter(e=>e.par>0);
+  const done=es.filter(e=>e.status==='completed');
+  const prog=es.filter(e=>e.status==='in_progress');
+  const over=es.filter(isOverdue);
+  const notStarted=es.filter(e=>e.status==='not_started'&&makeQty(e)!==0);
+  const denom=done.length+prog.length+notStarted.length;
+  const pct=denom?Math.round(done.length/denom*100):100;
+  return {total:es.length,done:done.length,prog:prog.length,notStarted:notStarted.length,over:over.length,pct,late:done.filter(e=>e.late).length};
+}
+function viewDash(){
+  const t=today(), st=dayStats(t), k=todayKey();
+  const wasteToday=S.waste.filter(w=>w.date===k);
+  const wasteCost=wasteToday.reduce((a,w)=>a+(item(w.itemId)?.cost||0)*w.qty,0);
+  const emps=S.users;
+  const perf=emps.map(u=>{
+    const mine=t.entries.filter(e=>e.assignedTo===u.id&&e.par>0&&makeQty(e)!==0);
+    const done=mine.filter(e=>e.status==='completed');
+    return {u,total:mine.length,done:done.length,pct:mine.length?Math.round(done.length/mine.length*100):null};
+  }).filter(p=>p.total);
+  const shortsToday=S.shortages.filter(s=>s.date===k);
+  const f=salesForecast(k);
+  const noPar=S.items.filter(i=>i.active&&Object.values(i.par).every(v=>!v));
+  const cAll=t.entries.filter(e=>e.par>0);
+  const cDone=cAll.filter(e=>e.current!=null);
+  const cMiss=cAll.filter(e=>e.current==null).map(e=>item(e.itemId)?.name).filter(Boolean);
+  return topbar("Today's prep",fmtDate(k))+`<div class="screen">
+    ${noPar.length?`<div class="warnbox">⚠️ ${noPar.length} items still need PARs. Set them in Setup or tap PAR on any card.</div>`:''}
+    ${cMiss.length?`<div class="warnbox">🔢 Counted ${cDone.length}/${cAll.length}. Missing: ${cMiss.slice(0,8).map(esc).join(', ')}${cMiss.length>8?` +${cMiss.length-8} more`:''}</div>`
+      :`<div class="okbox">🔢 All ${cAll.length} items counted today.</div>`}
+    <div class="statgrid">
+      <div class="stat"><div class="v">${st.total}</div><div class="k">Items</div></div>
+      <div class="stat green"><div class="v">${st.done}</div><div class="k">Complete</div></div>
+      <div class="stat gold"><div class="v">${st.prog}</div><div class="k">In progress</div></div>
+      <div class="stat"><div class="v">${st.notStarted}</div><div class="k">Not started</div></div>
+      <div class="stat red"><div class="v">${st.over}</div><div class="k">Overdue</div></div>
+      <div class="stat"><div class="v">${st.pct}%</div><div class="k">Completion</div></div>
+    </div>
+    <div class="card" style="padding:11px 14px"><div class="row" style="padding:0;border:none">
+      <div class="t">🧽 Cleaning</div>
+      <div class="r">${Object.keys(t.clean||{}).length}/${S.cleanTasks.filter(c=>c.active).length}</div></div></div>
+    <div class="card">
+      ${f?`<div class="row"><div class="t">Projected sales today</div><div class="r" style="color:var(--gold-lt)">${money0(f.proj)}</div></div>`:''}
+      <div class="row"><div><div class="t">Waste today</div><div class="s">${wasteToday.length} entries</div></div><div class="r" style="color:#FF7A87">${money(wasteCost)}</div></div>
+      <div class="row"><div class="t">Shortages today</div><div class="r">${shortsToday.length}</div></div>
+      <div class="row"><div class="t">Late completions</div><div class="r">${st.late}</div></div>
+    </div>
+    <div class="sechead">Crew performance today</div>
+    <div class="card">${perf.length?perf.map(p=>`
+      <div class="row"><div><div class="t">${esc(p.u.name)}</div><div class="s">${p.done}/${p.total} assigned items done</div></div>
+      <div class="r" style="color:${p.pct>=90?'#6FCB8A':p.pct>=60?'var(--gold-lt)':'#FF7A87'}">${p.pct}%</div></div>`).join(''):'<p class="notice">No prep assigned yet. Assign items from the Prep tab.</p>'}
+    </div>
+    <div class="sechead">Daily closeout</div>
+    ${t.closed?`<div class="okbox">Closed by ${esc(user(t.closedBy)?.name||'')} at ${t.closedAt?t.closedAt.slice(11):''}${S.sales[k]?` · Net sales ${money0(S.sales[k])}`:''}. Day is locked.</div>`
+    :`<div class="card">
+      <div class="row"><div class="t">Prep completion</div><div class="r">${st.pct}%</div></div>
+      <div class="row"><div class="t">Items not done</div><div class="r">${st.notStarted+st.prog}</div></div>
+      <div class="row"><div class="t">Waste</div><div class="r">${money(wasteCost)}</div></div>
+      <button class="btn primary" style="width:100%;margin-top:12px" data-sheet="closeout" data-id="">Close out today</button>
+    </div>`}
+  </div>`;
+}
+
+/* ---------------- WASTE ---------------- */
+function rangeDays(n){const out=[];for(let i=0;i<n;i++){const d=new Date();d.setDate(d.getDate()-i);out.push(ymd(d));}return out;}
+function viewWaste(){
+  const d7=rangeDays(7),d30=rangeDays(30);
+  const cost=ws=>ws.reduce((a,w)=>a+(item(w.itemId)?.cost||0)*w.qty,0);
+  const wToday=S.waste.filter(w=>w.date===todayKey());
+  const w7=S.waste.filter(w=>d7.includes(w.date));
+  const w30=S.waste.filter(w=>d30.includes(w.date));
+  const byItem={};w30.forEach(w=>{byItem[w.itemId]=(byItem[w.itemId]||0)+w.qty;});
+  const top=Object.entries(byItem).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  return topbar('Waste')+`<div class="screen">
+    <div class="statgrid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat red"><div class="v">${money(cost(wToday))}</div><div class="k">Today</div></div>
+      <div class="stat"><div class="v">${money(cost(w7))}</div><div class="k">7 days</div></div>
+      <div class="stat"><div class="v">${money(cost(w30))}</div><div class="k">30 days</div></div>
+    </div>
+    <button class="btn primary" style="width:100%" data-sheet="waste" data-id="">+ Record waste</button>
+    <div class="sechead">Highest waste — 30 days</div>
+    <div class="card">${top.length?top.map(([id,q])=>`<div class="row"><div class="t">${esc(item(id)?.name||'?')}</div><div class="r" style="color:#FF7A87">${q} ${esc(item(id)?.unit||'')}</div></div>`).join(''):'<p class="notice">No waste recorded yet.</p>'}</div>
+    <div class="sechead">Recent entries</div>
+    <div class="card">${S.waste.slice(-15).reverse().map(w=>`<div class="row">
+      <div><div class="t">${esc(item(w.itemId)?.name||'?')}</div><div class="s">${esc(w.reason)} · ${esc(user(w.by)?.name||'')} · ${esc(w.date)} ${esc(w.time)}</div></div>
+      <div class="r">${w.qty}</div></div>`).join('')||'<p class="notice">No entries yet.</p>'}</div>
+  </div>`;
+}
+
+/* ---------------- PARs / REPORTS ---------------- */
+function viewReports(){
+  const salesDays=Object.keys(S.sales).length;
+  const rated=S.items.filter(i=>i.active&&usageRate(i.id));
+  const wd=weekdayOf(todayKey());
+  // suggestions for each item for the CURRENT weekday + Fri/Sat
+  const targets=['mon','fri','sat'].includes(wd)?[wd,'fri','sat']:[wd,'fri','sat'];
+  const uniq=[...new Set(targets)];
+  const sugg=[];
+  S.items.filter(i=>i.active).forEach(it=>{
+    uniq.forEach(w=>{
+      // fake a date key of the next occurrence of weekday w for forecast
+      const d=new Date();const cur=d.getDay();const tgt=DAYS.indexOf(w);
+      d.setDate(d.getDate()+((tgt-cur)+7)%7);
+      const s=suggestedPar(it.id,ymd(d));
+      if(!s)return;
+      const curPar=it.par[w];
+      if(curPar===0||Math.abs(s.rec-curPar)/Math.max(curPar,1)>=0.15)
+        sugg.push({it,w,cur:curPar,rec:s.rec,proj:s.proj});
+    });
+  });
+  const days=rangeDays(ui.range).filter(k=>S.days[k]);
+  const allE=days.flatMap(k=>S.days[k].entries);
+  const need=allE.filter(e=>e.par>0&&e.par-(e.current??0)>0);
+  const done=need.filter(e=>e.status==='completed');
+  const onTime=done.filter(e=>!e.late);
+  const emps=S.users.map(u=>{
+    const mine=need.filter(e=>e.assignedTo===u.id);
+    const d=mine.filter(e=>e.status==='completed');
+    return {u,total:mine.length,pct:mine.length?Math.round(d.length/mine.length*100):null,
+      ot:d.length?Math.round(d.filter(e=>!e.late).length/d.length*100):null};
+  }).filter(x=>x.total);
+  return topbar('PAR engine')+`<div class="screen">
+    <div class="sechead">Learning status</div>
+    <div class="card">
+      <div class="row"><div><div class="t">Sales history</div><div class="s">Days of net sales loaded</div></div><div class="r" style="color:${salesDays>=60?'#6FCB8A':'var(--gold-lt)'}">${salesDays}</div></div>
+      <div class="row"><div><div class="t">Items with usage rates</div><div class="s">Need ~1 week of daily counts per item</div></div><div class="r" style="color:${rated.length?'#6FCB8A':'var(--txt3)'}">${rated.length}/${S.items.filter(i=>i.active).length}</div></div>
+      <button class="btn gold" style="width:100%;margin-top:10px" data-sheet="salesimport" data-id="">Import sales history</button>
+    </div>
+    ${rated.length?`<div class="sechead">Usage rates (per $1,000 sales)</div>
+    <div class="card">${rated.map(it=>`<div class="row"><div class="t">${esc(it.name)}</div><div class="r">${(usageRate(it.id)).toFixed(2)} ${esc(it.unit)}</div></div>`).join('')}</div>`:''}
+    <div class="sechead">Suggested PARs</div>
+    <p style="font-size:14px;color:var(--txt3);margin-bottom:10px">Projected sales × usage rate × 10% buffer, rounded to batch size. Suggestions appear once sales history and daily counts build up. Nothing changes without approval.</p>
+    ${sugg.length?`<button class="btn gold" style="width:100%;margin-bottom:10px" data-act="applyallsugg">Approve all — update every PAR from the data</button>`:''}
+    <div class="card">${sugg.length?sugg.slice(0,12).map(s=>`
+      <div class="row"><div><div class="t">${esc(s.it.name)} · ${DAYL[s.w]}</div><div class="s">Projected ${money0(s.proj)}</div></div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="r">${s.cur||'—'} → <span style="color:var(--gold-lt)">${s.rec}</span></div>
+          <button class="btn gold sm" data-act="applysugg" data-item="${s.it.id}" data-wd="${s.w}" data-rec="${s.rec}">Approve</button>
+        </div></div>`).join(''):'<p class="notice">Not enough data yet. Import sales history and run daily counts for about a week.</p>'}
+    </div>
+    <div class="sechead">Holiday calendar</div>
+    <div class="card">${S.holidays.map(h=>{const lm=learnedMult(h);return `<div class="row">
+      <div><div class="t">${esc(h.name)}</div><div class="s">${h.type==='fixed'?`${h.m}/${h.d} every year`:h.type==='date'?esc(h.date):'floating date, auto'}</div></div>
+      <div style="display:flex;align-items:center;gap:10px"><div class="r">×${lm||h.mult}${lm?'<span style="font-size:11px;color:#6FCB8A"> learned</span>':''}</div>
+      <button class="linklike" data-sheet="holiday" data-id="${h.id}" style="font-size:14px">Edit</button></div></div>`;}).join('')}
+      <button class="btn ghost" style="width:100%;margin-top:10px" data-sheet="holiday" data-id="">+ Add event (Super Bowl, Scarecrow Fest…)</button>
+    </div>
+    <div class="sechead">Crew performance — ${ui.range} days</div>
+    <div class="chips">${[7,30,90].map(n=>`<button class="chip ${ui.range===n?'on':''}" data-range="${n}">${n} days</button>`).join('')}</div>
+    <div class="card">${emps.length?`<table class="table"><tr><th>Employee</th><th>Items</th><th>Done</th><th>On time</th></tr>
+      ${emps.map(e=>`<tr><td>${esc(e.u.name)}</td><td class="n">${e.total}</td><td class="n">${e.pct}%</td><td class="n">${e.ot??'—'}${e.ot!=null?'%':''}</td></tr>`).join('')}</table>`:'<p class="notice">No history yet.</p>'}</div>
+  </div>`;
+}
+
+/* ---------------- SETUP ---------------- */
+function viewAdmin(){
+  const noPar=S.items.filter(i=>i.active&&Object.values(i.par).every(v=>!v));
+  const cats=['Pizza Prep','Meats','Veggies','Kitchen'];
+  return topbar('Setup')+`<div class="screen">
+    ${noPar.length?`<div class="warnbox">⚠️ ${noPar.length} of ${S.items.filter(i=>i.active).length} items need starting PARs. Tap any item to set unit + PARs.</div>`:''}
+    <div class="sechead">Prep items</div>
+    <button class="btn primary" style="width:100%;margin-bottom:12px" data-sheet="item" data-id="">+ Add prep item</button>
+    ${cats.map(c=>`<div class="sechead" style="margin-top:14px">${c}</div><div class="card">
+      ${S.items.filter(i=>i.cat===c).map(it=>`<div class="row">
+        <div><div class="t">${esc(it.name)}${it.active?'':' <span style="color:var(--txt3)">(inactive)</span>'}</div>
+        <div class="s">${esc(it.unit||'no unit')} · M ${it.par.mon} / F ${it.par.fri} / S ${it.par.sat}${Object.values(it.par).every(v=>!v)?' · <span style="color:var(--gold-lt)">NEEDS PAR</span>':''}</div></div>
+        <button class="linklike" data-sheet="item" data-id="${it.id}">Edit</button></div>`).join('')||'<p class="notice">None</p>'}
+    </div>`).join('')}
+    <div class="sechead">Cleaning tasks</div>
+    <button class="btn ghost" style="width:100%;margin-bottom:12px" data-sheet="cleantask" data-id="">+ Add cleaning task</button>
+    <div class="card">${S.cleanTasks.map(c=>`<div class="row">
+      <div><div class="t">${esc(c.name)}${c.active?'':' <span style="color:var(--txt3)">(inactive)</span>'}</div><div class="s">${esc(c.shift)}</div></div>
+      <button class="linklike" data-sheet="cleantask" data-id="${c.id}">Edit</button></div>`).join('')||'<p class="notice">None yet.</p>'}
+    </div>
+    <div class="sechead">Crew</div>
+    <button class="btn ghost" style="width:100%;margin-bottom:12px" data-sheet="user" data-id="">+ Add cook</button>
+    <div class="card">${S.users.map(u=>`<div class="row">
+      <div><div class="t">${esc(u.name)}</div></div>
+      <button class="linklike" data-sheet="user" data-id="${u.id}">Edit</button></div>`).join('')}
+    </div>
+    <div class="sechead">Sales data</div>
+    <div class="card">
+      <div class="row"><div class="t">Days loaded</div><div class="r">${Object.keys(S.sales).length}</div></div>
+      <button class="btn gold" style="width:100%;margin-top:8px" data-sheet="salesimport" data-id="">Import sales history (CSV)</button>
+      <button class="btn ghost" style="width:100%;margin-top:8px" data-sheet="dataexport" data-id="">Export data for Claude review</button>
+      <button class="btn ghost" style="width:100%;margin-top:8px" data-sheet="importall" data-id="">Restore from old app export</button>
+    </div>
+    <div class="sechead">Audit log</div>
+    <div class="card">${S.audit.slice(0,12).map(a=>`<div class="row"><div><div class="t" style="font-size:15px;font-weight:500">${esc(a.action)}</div>
+      <div class="s">${esc(user(a.by)?.name||'System')} · ${new Date(a.at).toLocaleString([],{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</div></div></div>`).join('')||'<p class="notice">No activity yet.</p>'}
+    </div>
+  </div>`;
+}
+
+/* ---------------- SHEETS ---------------- */
+function sheetHtml(){
+  const s=ui.sheet;const fn={complete:shComplete,waste:shWaste,short:shShort,assign:shAssign,override:shOverride,item:shItem,user:shUser,emergency:shEmergency,closeout:shCloseout,salesimport:shSalesImport,holiday:shHoliday,who:shWho,dataexport:shExport,cleantask:shCleanTask,importall:shImportAll}[s.kind];
+  return `<div class="sheetwrap" data-close="1"><div class="sheet"><div class="grabber"></div>${fn(s)}</div></div>`;
+}
+function entryById(id){return today().entries.find(e=>e.id===id);}
+function shComplete(s){const e=entryById(s.id),it=item(e.itemId),bp=batchPlan(e);
+  return `<h2>Complete — ${esc(it.name)}</h2><div class="sub">Target: make ${makeQty(e)} ${esc(it.unit)}${bp?` (${bp.n} batches → ${bp.expected})`:''}</div>
+  <label>Actual quantity produced (${esc(it.unit)})</label>
+  <div class="stepper"><button data-step="-1">−</button><input id="f-qty" type="number" inputmode="decimal" value="${bp?bp.expected:makeQty(e)}"><button data-step="1">+</button></div>
+  <label>Notes (optional)</label><input id="f-notes" placeholder="Anything the manager should know">
+  <button class="btn go" style="width:100%;margin-top:16px" data-act="savecomplete" data-id="${e.id}">✓ Mark complete</button>`;}
+function shWaste(s){
+  const opts=S.items.filter(i=>i.active).map(i=>`<option value="${i.id}" ${s.id&&entryById(s.id)?.itemId===i.id?'selected':''}>${esc(i.name)}</option>`).join('');
+  return `<h2>Record waste</h2>
+  <label>Item</label><select id="f-item">${opts}</select>
+  <label>Quantity</label>
+  <div class="stepper"><button data-step="-1">−</button><input id="f-qty" type="number" inputmode="decimal" value="1"><button data-step="1">+</button></div>
+  <label>Reason</label><div class="optgrid" id="f-reason">${['Expired','Dropped','Overproduction','Quality issue','Other'].map((r,i)=>`<button class="opt ${i===0?'on':''}" data-opt="${r}">${r}</button>`).join('')}</div>
+  <button class="btn primary" style="width:100%;margin-top:16px" data-act="savewaste">Record waste</button>`;}
+function shShort(s){const e=entryById(s.id),it=item(e.itemId);
+  return `<h2>⚠️ Report shortage</h2><div class="sub">${esc(it.name)} — PAR ${e.par} ${esc(it.unit)}</div>
+  <label>Walk-in quantity available</label>
+  <div class="stepper"><button data-step="-1">−</button><input id="f-qty" type="number" inputmode="decimal" value="${e.current??0}"><button data-step="1">+</button></div>
+  <label>What's the problem?</label><input id="f-notes" placeholder="Out of product, delivery didn't come, etc.">
+  <button class="btn primary" style="width:100%;margin-top:16px" data-act="saveshort" data-id="${e.id}">Send alert to manager</button>`;}
+function shAssign(s){const e=entryById(s.id),it=item(e.itemId);
+  const emps=S.users.filter(u=>u.role!=='admin');
+  return `<h2>Assign — ${esc(it.name)}</h2>
+  <div class="optgrid" id="f-assign">${emps.map(u=>`<button class="opt ${e.assignedTo===u.id?'on':''}" data-opt="${u.id}">${esc(u.name)}</button>`).join('')}
+  <button class="opt ${!e.assignedTo?'on':''}" data-opt="">Unassigned</button></div>
+  <button class="btn go" style="width:100%;margin-top:16px" data-act="saveassign" data-id="${e.id}">Save</button>`;}
+function shOverride(s){const e=entryById(s.id),it=item(e.itemId);
+  return `<h2>Today's PAR — ${esc(it.name)}</h2><div class="sub">${e.parBase>0?`Permanent PAR stays ${e.parBase}. This changes today only and is logged.`:"No permanent PAR set yet. Set today's target here, permanent PARs in Setup."}</div>
+  <div class="stepper"><button data-step="-1">−</button><input id="f-qty" type="number" inputmode="decimal" value="${e.par}"><button data-step="1">+</button></div>
+  <button class="btn gold" style="width:100%;margin-top:16px" data-act="saveoverride" data-id="${e.id}">Set today's PAR</button>`;}
+function shEmergency(){
+  const opts=S.items.filter(i=>i.active).map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join('');
+  return `<h2>Emergency prep</h2><div class="sub">Adds an extra prep line to today's list.</div>
+  <label>Item</label><select id="f-item">${opts}</select>
+  <label>Quantity needed</label>
+  <div class="stepper"><button data-step="-1">−</button><input id="f-qty" type="number" inputmode="decimal" value="1"><button data-step="1">+</button></div>
+  <button class="btn primary" style="width:100%;margin-top:16px" data-act="saveemergency">Add to today's prep</button>`;}
+function shCloseout(){
+  const k=todayKey(), st=dayStats(today());
+  return `<h2>Daily closeout</h2><div class="sub">${fmtDate(k)} — ${st.pct}% complete, ${st.notStarted+st.prog} items not done</div>
+  <label>Net sales today ($) — required, feeds the PAR engine</label>
+  <input id="f-sales" type="number" inputmode="decimal" placeholder="2450" value="${S.sales[k]||''}">
+  <button class="btn primary" style="width:100%;margin-top:16px" data-act="savecloseout">Confirm — daily prep complete</button>`;}
+function shSalesImport(){
+  return `<h2>Import sales history</h2>
+  <div class="sub">Paste from your iControl Sales by Day export. One day per line: <b>date, net sales</b>. Accepts 1/6/2025 or 2025-01-06, commas or tabs, $ signs fine.</div>
+  <textarea id="f-csv" rows="8" placeholder="1/6/2025, 2104.55&#10;1/7/2025, 1988.10&#10;1/8/2025, 2377.90"></textarea>
+  <button class="btn gold" style="width:100%;margin-top:16px" data-act="importsales">Import</button>`;}
+function shExport(){
+  const data={exported:new Date().toISOString(),location:S.location,
+    sales:S.sales,
+    days:Object.fromEntries(Object.entries(S.days).map(([k,d])=>[k,{closed:d.closed,
+      entries:d.entries.map(e=>({item:item(e.itemId)?.name,par:e.par,current:e.current,status:e.status,
+        made:e.qty,by:user(e.completedBy)?.name||null,late:e.late,started:e.startedAt,completed:e.completedAt,notes:e.notes||undefined,
+        counts:(e.countLog||[]).map(c=>({t:c.t,v:c.v,by:user(c.by)?.name}))})),
+      cleaning:Object.fromEntries(Object.entries(d.clean||{}).map(([cid,x])=>[S.cleanTasks.find(c=>c.id===cid)?.name||cid,{by:user(x.by)?.name,at:x.at}]))}])),
+    waste:S.waste.map(w=>({date:w.date,item:item(w.itemId)?.name,qty:w.qty,reason:w.reason,by:user(w.by)?.name})),
+    shortages:S.shortages.map(s2=>({date:s2.date,item:item(s2.itemId)?.name,current:s2.current,need:s2.need,note:s2.note,resolved:s2.resolved})),
+    usageRates:Object.fromEntries(S.items.filter(i=>i.active&&usageRate(i.id)).map(i=>[i.name,Math.round(usageRate(i.id)*100)/100]))};
+  return `<h2>Export data</h2><div class="sub">Copy this and paste it to Claude for the weekly review.</div>
+  <textarea id="f-export" rows="9" readonly style="font-size:12px">${esc(JSON.stringify(data))}</textarea>
+  <button class="btn gold" style="width:100%;margin-top:12px" data-act="copyexport">Copy to clipboard</button>`;}
+function shImportAll(){
+  return `<h2>Restore from old app</h2>
+  <div class="sub">In the old app: Setup → Export data for Claude review → Copy. Paste it here. Brings over day history, counts, waste, shortages, and sales. Safe to run more than once — it never overwrites days already on this board.</div>
+  <textarea id="f-restore" rows="8" placeholder='{"exported":"...","days":{...}}' style="font-size:12px"></textarea>
+  <button class="btn gold" style="width:100%;margin-top:16px" data-act="restoreall">Restore</button>`;}
+function shHoliday(s){
+  const h=s.id?S.holidays.find(x=>x.id===s.id):{name:'',type:'date',date:'',mult:1.3};
+  return `<h2>${s.id?'Edit':'Add'} event</h2>
+  <label>Name</label><input id="f-name" value="${esc(h.name)}" placeholder="Super Bowl, Scarecrow Festival…">
+  ${h.type==='date'||!s.id?`<label>Date (this year's)</label><input id="f-date" type="date" value="${esc(h.date||'')}">`:`<div class="sub" style="margin-top:10px">${h.type==='fixed'?`Fixed date: ${h.m}/${h.d} every year`:'Floating date, calculated automatically each year'}</div>`}
+  <label>Sales multiplier (1.3 = 30% busier)</label><input id="f-mult" type="number" step="0.05" inputmode="decimal" value="${h.mult}">
+  <button class="btn go" style="width:100%;margin-top:16px" data-act="saveholiday" data-id="${s.id||''}">Save</button>
+  ${s.id&&h.type==='date'?`<button class="btn ghost" style="width:100%;margin-top:8px" data-act="delholiday" data-id="${s.id}">Delete</button>`:''}`;}
+function shItem(s){
+  const it=s.id?item(s.id):{name:'',cat:'Pizza Prep',unit:'',par:{mon:0,tue:0,wed:0,thu:0,fri:0,sat:0,sun:0},batch:1,shelf:'',station:'',shift:'Opening',prio:'normal',cost:0,active:true};
+  const cats=['Pizza Prep','Meats','Veggies','Kitchen','Other'];
+  return `<h2>${s.id?esc(it.name):'New prep item'}</h2>
+  <label>Item name</label><input id="f-name" value="${esc(it.name)}">
+  <label>Category</label><select id="f-cat">${cats.map(c=>`<option ${it.cat===c?'selected':''}>${c}</option>`).join('')}</select>
+  <label>Unit</label><input id="f-unit" value="${esc(it.unit)}" placeholder="trays, qts, lbs, pans">
+  <label>PAR by day</label>
+  <div class="dayparsgrid">${['mon','tue','wed','thu','fri','sat','sun'].map(d=>`<div class="dp"><span>${DAYL[d]}</span><input data-par="${d}" type="number" inputmode="numeric" value="${it.par[d]}"></div>`).join('')}</div>
+  <label>Batch size (units per batch, 1 = no batching)</label><input id="f-batch" type="number" inputmode="decimal" value="${it.batch}">
+  <label>Shelf life</label><input id="f-shelf" value="${esc(it.shelf)}" placeholder="24 hours">
+  <label>Shift</label><select id="f-shift">${['Opening','Midday','Dinner','Closing'].map(x=>`<option ${it.shift===x?'selected':''}>${x}</option>`).join('')}</select>
+  <label>Priority</label><select id="f-prio">${['critical','high','normal','low'].map(x=>`<option ${it.prio===x?'selected':''}>${x}</option>`).join('')}</select>
+  <label>Unit cost ($, for waste tracking)</label><input id="f-cost" type="number" inputmode="decimal" value="${it.cost||0}">
+  <label>Active</label><select id="f-active"><option value="1" ${it.active?'selected':''}>Active</option><option value="0" ${!it.active?'selected':''}>Inactive</option></select>
+  <button class="btn go" style="width:100%;margin-top:16px" data-act="saveitem" data-id="${s.id||''}">Save item</button>
+  ${s.id?`<button class="btn ghost" style="width:100%;margin-top:8px" data-act="delitem" data-id="${s.id}">Delete item</button>`:''}`;}
+function shUser(s){
+  const u=s.id?user(s.id):{name:''};
+  return `<h2>${s.id?'Edit':'Add'} cook</h2>
+  <label>Name</label><input id="f-name" value="${esc(u.name)}">
+  <button class="btn go" style="width:100%;margin-top:16px" data-act="saveuser" data-id="${s.id||''}">Save</button>
+  ${s.id?`<button class="btn ghost" style="width:100%;margin-top:8px" data-act="deluser" data-id="${s.id}">Remove</button>`:''}`;}
+function shCleanTask(s){
+  const c=s.id?S.cleanTasks.find(x=>x.id===s.id):{name:'',shift:'Closing',active:true};
+  return `<h2>${s.id?'Edit':'Add'} cleaning task</h2>
+  <label>Task</label><input id="f-name" value="${esc(c.name)}" placeholder="Sweep & mop kitchen floor">
+  <label>Shift</label><select id="f-shift">${['Opening','Midday','Dinner','Closing'].map(x=>`<option ${c.shift===x?'selected':''}>${x}</option>`).join('')}</select>
+  <label>Active</label><select id="f-active"><option value="1" ${c.active?'selected':''}>Active</option><option value="0" ${!c.active?'selected':''}>Inactive</option></select>
+  <button class="btn go" style="width:100%;margin-top:16px" data-act="savecleantask" data-id="${s.id||''}">Save</button>
+  ${s.id?`<button class="btn ghost" style="width:100%;margin-top:8px" data-act="delcleantask" data-id="${s.id}">Delete</button>`:''}`;}
+function shWho(){
+  return `<h2>Who's working?</h2><div class="sub">Tap your name. Counts and completions get logged under it.</div>
+  <div class="optgrid">${S.users.map(u=>`<button class="opt ${me.id===u.id?'on':''}" data-who="${u.id}">${esc(u.name)}</button>`).join('')}</div>`;}
+
+/* ---------------- actions ---------------- */
+function openSheet(kind,id){ui.sheet={kind,id};render();}
+function closeSheet(){ui.sheet=null;render();}
+function num(id){return parseFloat($(id)?.value)||0;}
+
+function parseSalesCSV(text){
+  const out={};let n=0;
+  text.split(/\n+/).forEach(line=>{
+    const parts=line.split(/[,\t;]+/).map(x=>x.trim()).filter(Boolean);
+    if(parts.length<2)return;
+    let dstr=parts[0], sstr=parts[parts.length-1].replace(/[$,\s]/g,'');
+    const amt=parseFloat(sstr); if(isNaN(amt)||amt<=0)return;
+    let key=null;
+    if(/^\d{4}-\d{1,2}-\d{1,2}$/.test(dstr)){const [y,m,d]=dstr.split('-');key=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
+    else if(/^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}$/.test(dstr)){
+      const [m,d,y0]=dstr.split(/[\/\-]/);const y=y0.length===2?'20'+y0:y0;
+      key=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
+    if(!key)return;
+    out[key]=amt;n++;
+  });
+  return {out,n};
+}
+
+const ACTIONS={
+  mine(){ui.mine=!ui.mine;render();},
+  start(el){const e=entryById(el.dataset.id);if(!e)return;
+    if(e.current==null){toast('Enter on-hand count first');return;}
+    e.status='in_progress';e.startedAt=todayKey()+'T'+new Date().toTimeString().slice(0,5);e.startedBy=me.id;
+    if(!e.assignedTo)e.assignedTo=me.id;
+    log(`Started ${item(e.itemId).name}`);saveState();render();},
+  makemore(el){const e=entryById(el.dataset.id);if(!e)return;
+    e.status='in_progress';e.reopened=true;
+    log(`Reopened ${item(e.itemId).name} — making more`);saveState();render();},
+  savecomplete(el){const e=entryById(el.dataset.id);
+    const made=num('#f-qty');
+    e.status='completed';e.qty=e.reopened?(e.qty||0)+made:made;e.reopened=false;e.notes=$('#f-notes').value.trim();
+    e.completedAt=todayKey()+'T'+new Date().toTimeString().slice(0,5);e.completedBy=me.id;
+    const [h,m]=dueTimeFor(e).split(':').map(Number);const now=new Date();
+    e.late=now.getHours()*60+now.getMinutes()>h*60+m;
+    log(`Completed ${item(e.itemId).name} — ${e.qty} ${item(e.itemId).unit}`);
+    saveState();closeSheet();toast('✓ Prep complete');},
+  savewaste(){const itemId=$('#f-item').value,qty=num('#f-qty');
+    const reason=$('#f-reason .opt.on')?.dataset.opt||'Other';
+    if(qty<=0){toast('Enter a quantity');return;}
+    S.waste.push({id:uid(),date:todayKey(),time:nowT(),itemId,qty,reason,by:me.id});
+    log(`Waste: ${qty} ${item(itemId).unit} ${item(itemId).name} (${reason})`);
+    saveState();closeSheet();toast('Waste recorded');},
+  saveshort(el){const e=entryById(el.dataset.id);const cur=num('#f-qty');
+    e.current=cur;
+    S.shortages.push({id:uid(),date:todayKey(),time:nowT(),itemId:e.itemId,current:cur,need:clamp0(e.par-cur),note:$('#f-notes').value.trim(),by:me.id,resolved:false});
+    log(`Shortage reported: ${item(e.itemId).name}`);
+    saveState();closeSheet();toast('⚠️ Manager alerted');},
+  cleantoggle(el){const t=today();const id=el.dataset.id;
+    if(t.clean[id])delete t.clean[id];
+    else{t.clean[id]={by:me.id,at:nowT()};log(`Cleaned: ${S.cleanTasks.find(c=>c.id===id)?.name}`);}
+    saveState();render();},
+  savecleantask(el){const id=el.dataset.id;const name=$('#f-name').value.trim();
+    if(!name){toast('Name required');return;}
+    const data={name,shift:$('#f-shift').value,active:$('#f-active').value==='1'};
+    if(id){Object.assign(S.cleanTasks.find(c=>c.id===id),data);log(`Edited cleaning task ${name}`);}
+    else{S.cleanTasks.push({id:uid(),...data});log(`Added cleaning task ${name}`);}
+    saveState();closeSheet();toast('Saved');},
+  delcleantask(el){S.cleanTasks=S.cleanTasks.filter(c=>c.id!==el.dataset.id);saveState();closeSheet();},
+  resolve(el){const s=S.shortages.find(x=>x.id===el.dataset.id);s.resolved=true;
+    log(`Shortage resolved: ${item(s.itemId)?.name||''}`);saveState();render();},
+  saveassign(el){const e=entryById(el.dataset.id);
+    e.assignedTo=$('#f-assign .opt.on')?.dataset.opt||null;
+    log(`Assigned ${item(e.itemId).name} to ${e.assignedTo?user(e.assignedTo).name:'no one'}`);
+    saveState();closeSheet();},
+  saveoverride(el){const e=entryById(el.dataset.id);const to=num('#f-qty');
+    if(to===e.par){closeSheet();return;}
+    e.override={from:e.par,to,by:me.id,at:nowT()};e.par=to;
+    log(`Today's PAR for ${item(e.itemId).name}: ${e.override.from} → ${to}`);
+    saveState();closeSheet();toast('PAR set for today');},
+  saveemergency(){const itemId=$('#f-item').value,qty=num('#f-qty');
+    today().entries.push({id:uid(),itemId,par:qty,parBase:qty,override:null,holiday:null,current:0,assignedTo:null,
+      status:'not_started',emergency:true,startedAt:null,startedBy:null,completedAt:null,completedBy:null,late:false,qty:null,notes:''});
+    log(`Emergency prep added: ${qty} ${item(itemId).unit} ${item(itemId).name}`);
+    saveState();closeSheet();toast('Added to today');},
+  savecloseout(){const k=todayKey();const sales=num('#f-sales');
+    if(sales<=0){toast('Enter net sales');return;}
+    S.sales[k]=sales;
+    const t=today();t.closed=true;t.closedBy=me.id;t.closedAt=k+'T'+new Date().toTimeString().slice(0,5);
+    log(`Daily closeout — net sales ${money0(sales)}`);saveState();closeSheet();toast('Day closed');},
+  importsales(){const {out,n}=parseSalesCSV($('#f-csv').value);
+    if(!n){toast('No valid lines found');return;}
+    Object.assign(S.sales,out);
+    log(`Imported ${n} days of sales history`);saveState();closeSheet();toast(`${n} days imported`);},
+  applyallsugg(){
+    let n=0;
+    S.items.filter(i=>i.active).forEach(it=>{
+      DAYS.forEach(w=>{
+        const d=new Date();const cur=d.getDay();const tgt=DAYS.indexOf(w);
+        d.setDate(d.getDate()+((tgt-cur)+7)%7);
+        const s=suggestedPar(it.id,ymd(d));
+        if(!s)return;
+        const curPar=it.par[w];
+        if((curPar===0||Math.abs(s.rec-curPar)/Math.max(curPar,1)>=0.15)&&it.par[w]!==s.rec){it.par[w]=s.rec;n++;}
+      });
+    });
+    if(!n){toast('PARs already match the data');return;}
+    log(`Applied ${n} recommended PAR changes`);
+    saveState();render();toast(`✓ Updated ${n} PAR levels from the data`);
+  },
+  applysugg(el){const it=item(el.dataset.item);const w=el.dataset.wd;const rec=parseInt(el.dataset.rec);
+    it.par[w]=rec;log(`Approved PAR: ${it.name} ${DAYL[w]} → ${rec}`);saveState();render();toast('PAR updated');},
+  saveholiday(el){const id=el.dataset.id;
+    const mult=parseFloat($('#f-mult').value)||1.3;
+    if(id){const h=S.holidays.find(x=>x.id===id);h.mult=mult;
+      if(h.type==='date'){h.name=$('#f-name').value.trim()||h.name;h.date=$('#f-date').value||h.date;}
+      log(`Edited event ${h.name}`);}
+    else{const name=$('#f-name').value.trim();const date=$('#f-date').value;
+      if(!name||!date){toast('Name + date required');return;}
+      S.holidays.push({id:uid(),name,type:'date',date,mult});
+      // refresh today if it just became a holiday
+      if(date===todayKey()&&S.days[date]&&!S.days[date].closed){delete S.days[date];ensureToday();}
+      log(`Added event ${name} ×${mult}`);}
+    saveState();closeSheet();toast('Saved');},
+  delholiday(el){S.holidays=S.holidays.filter(h=>h.id!==el.dataset.id);saveState();closeSheet();},
+  saveitem(el){
+    const id=el.dataset.id;const name=$('#f-name').value.trim();if(!name){toast('Name required');return;}
+    const par={};document.querySelectorAll('[data-par]').forEach(i=>par[i.dataset.par]=parseFloat(i.value)||0);
+    const data={name,cat:$('#f-cat').value,unit:$('#f-unit').value.trim(),par,
+      batch:num('#f-batch')||1,shelf:$('#f-shelf').value.trim(),
+      shift:$('#f-shift').value,prio:$('#f-prio').value,cost:num('#f-cost'),active:$('#f-active').value==='1'};
+    if(id){Object.assign(item(id),data);
+      // sync today's entry par if not overridden/completed
+      const e=today().entries.find(x=>x.itemId===id);
+      if(e&&!e.override&&e.status!=='completed'){const wd=weekdayOf(todayKey());
+        e.parBase=par[wd];e.par=e.holiday?Math.ceil(par[wd]*e.holiday.mult):par[wd];}
+      log(`Edited item ${name}`);}
+    else{const it={id:uid(),demo:false,notes:'',station:'',prepMin:15,...data};S.items.push(it);
+      if(it.active&&!today().closed){const wd=weekdayOf(todayKey());
+        today().entries.push({id:uid(),itemId:it.id,par:it.par[wd],parBase:it.par[wd],override:null,holiday:null,current:null,assignedTo:null,status:'not_started',emergency:false,startedAt:null,startedBy:null,completedAt:null,completedBy:null,late:false,qty:null,notes:''});}
+      log(`Created item ${name}`);}
+    saveState();closeSheet();toast('Item saved');},
+  delitem(el){if(!confirm('Delete this item?'))return;const id=el.dataset.id;
+    log(`Deleted item ${item(id)?.name}`);
+    S.items=S.items.filter(i=>i.id!==id);
+    Object.values(S.days).forEach(d=>d.entries=d.entries.filter(e=>e.itemId!==id));
+    saveState();closeSheet();},
+  restoreall(){
+    let d;try{d=JSON.parse($('#f-restore').value);}catch(e){toast('That is not valid JSON');return;}
+    if(!d||typeof d!=='object'||!(d.days||d.sales||d.waste)){toast('Nothing to restore in that paste');return;}
+    try{
+      const byName=n=>n?(S.items.find(i=>i.name===n)||S.items.find(i=>i.name.split(' (')[0]===String(n).split(' (')[0])):null;
+      const userByName=n=>{if(!n)return null;let u=S.users.find(x=>x.name===n);if(!u){u={id:uid(),name:n};S.users.push(u);}return u.id;};
+      const cleanByName=n=>{let c=S.cleanTasks.find(x=>x.name===n);if(!c){c={id:uid(),name:n,shift:'Closing',active:true};S.cleanTasks.push(c);}return c.id;};
+      let nd=0,ns=0;
+      if(d.sales)Object.keys(d.sales).forEach(k=>{if(!(k in S.sales)||EMBEDDED_SALES[k]===S.sales[k]){S.sales[k]=d.sales[k];ns++;}});
+      if(d.days)Object.entries(d.days).forEach(([k,day])=>{
+        if(S.days[k])return; /* never clobber days already on this board */
+        const entries=(day.entries||[]).map(e=>{const it=byName(e.item);if(!it)return null;
+          return {id:uid(),itemId:it.id,par:e.par??0,parBase:e.par??0,override:null,holiday:null,
+            current:e.current??null,assignedTo:null,status:e.status||'not_started',emergency:false,
+            startedAt:e.started||null,startedBy:null,completedAt:e.completed||null,completedBy:userByName(e.by),
+            late:!!e.late,qty:e.made??null,notes:e.notes||'',
+            countLog:(e.counts||[]).map(c=>({t:c.t,v:c.v,by:userByName(c.by)}))};}).filter(Boolean);
+        const clean={};Object.entries(day.cleaning||{}).forEach(([n,x])=>{clean[cleanByName(n)]={by:userByName(x.by),at:x.at};});
+        S.days[k]={entries,clean,closed:!!day.closed,closedBy:null,closedAt:null};nd++;
+      });
+      if(Array.isArray(d.waste))d.waste.forEach(w=>{const it=byName(w.item);
+        if(it&&!S.waste.some(x=>x.date===w.date&&x.itemId===it.id&&x.qty===w.qty))S.waste.push({id:uid(),date:w.date,time:'',itemId:it.id,qty:w.qty,reason:w.reason||'Other',by:userByName(w.by)});});
+      if(Array.isArray(d.shortages))d.shortages.forEach(x=>{const it=byName(x.item);
+        if(it)S.shortages.push({id:uid(),date:x.date,time:'',itemId:it.id,current:x.current,need:x.need,note:x.note||'',by:null,resolved:!!x.resolved});});
+      log(`Restored from old app: ${nd} days, ${ns} sales entries`);
+      saveState();closeSheet();render();toast(`✓ Restored ${nd} days of history`);
+    }catch(e){toast('Restore hit an error — nothing was changed');}
+  },
+  copyexport(){const t=$('#f-export');t.select();t.setSelectionRange(0,99999999);
+    try{navigator.clipboard.writeText(t.value).then(()=>toast('Copied — paste it to Claude'));}
+    catch(e){document.execCommand('copy');toast('Copied — paste it to Claude');}},
+  saveuser(el){const id=el.dataset.id;const name=$('#f-name').value.trim();
+    if(!name){toast('Name required');return;}
+    if(id){user(id).name=name;log(`Edited cook ${name}`);}
+    else{S.users.push({id:uid(),name});log(`Added cook ${name}`);}
+    saveState();closeSheet();toast('Saved');},
+  deluser(el){if(!confirm('Remove this cook?'))return;
+    log(`Removed cook ${user(el.dataset.id)?.name}`);
+    if(me.id===el.dataset.id)me=S.users.find(u=>u.id!==el.dataset.id)||me;
+    S.users=S.users.filter(u=>u.id!==el.dataset.id);saveState();closeSheet();},
+};
+
+/* ---------------- binding ---------------- */
+function bind(){
+  document.querySelectorAll('[data-who]').forEach(b=>b.onclick=()=>{me=user(b.dataset.who)||me;closeSheet();});
+  document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>{ui.view=b.dataset.nav;render();});
+  document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{ui.cat=b.dataset.cat;render();});
+  document.querySelectorAll('[data-range]').forEach(b=>b.onclick=()=>{ui.range=parseInt(b.dataset.range);render();});
+  document.querySelectorAll('[data-sheet]').forEach(b=>b.onclick=ev=>{ev.stopPropagation();openSheet(b.dataset.sheet,b.dataset.id);});
+  document.querySelectorAll('[data-act]').forEach(b=>b.onclick=ev=>{ev.stopPropagation();ACTIONS[b.dataset.act]?.(b);});
+  document.querySelectorAll('[data-opt]').forEach(b=>b.onclick=()=>{
+    b.parentElement.querySelectorAll('.opt').forEach(o=>o.classList.remove('on'));b.classList.add('on');});
+  document.querySelectorAll('[data-step]').forEach(b=>b.onclick=()=>{
+    const i=b.parentElement.querySelector('input');i.value=clamp0((parseFloat(i.value)||0)+parseInt(b.dataset.step));});
+  /* inline on-hand entry */
+  document.querySelectorAll('[data-oh]').forEach(inp=>{
+    inp.onclick=ev=>ev.stopPropagation();
+    inp.onchange=()=>{
+      const e=entryById(inp.dataset.oh);if(!e)return;
+      const v=inp.value===''?null:clamp0(parseFloat(inp.value)||0);
+      e.current=v;
+      if(v!=null){e.countLog=e.countLog||[];e.countLog.push({t:new Date().toTimeString().slice(0,5),v,by:me.id});
+        log(`Counted ${item(e.itemId).name}: ${v} in walk-in`);}
+      saveState();render();
+    };
+  });
+  const sw=$('.sheetwrap');if(sw)sw.onclick=ev=>{if(ev.target===sw)closeSheet();};
+}
+
+/* ---------------- migrations (run at boot and after every sync pull) ---------------- */
+function migrate(){
+  let merged=0;
+  /* merge embedded sales history back in (stored state only carries diffs) */
+  Object.keys(EMBEDDED_SALES).forEach(k=>{if(!(k in S.sales))S.sales[k]=EMBEDDED_SALES[k];});
+  /* merge any newly added default holidays by name */
+  defaultHolidays().forEach(h=>{if(!S.holidays.some(x=>x.name===h.name))S.holidays.push(h);});
+  /* cleaning checklist migration */
+  if(!S.cleanTasks){S.cleanTasks=defaultCleanTasks();merged++;}
+  Object.values(S.days).forEach(d=>{if(!d.clean)d.clean={};});
+  /* crew names */
+  {const ren={'Cook 1':'Marcelino','Cook 2':'Juan','Cook 3':'Josue'};
+   S.users.forEach(u=>{if(ren[u.name]){u.name=ren[u.name];merged++;}});
+   ['Marcelino','Juan','Josue'].forEach(n=>{if(!S.users.some(u=>u.name===n)){S.users.push({id:uid(),name:n});merged++;}});}
+  /* dough runs noon-to-noon: midday shift, counted before the make */
+  {const d=S.items.find(i=>i.name==='Dough');if(d&&d.shift!=='Midday'){d.shift='Midday';merged++;}
+   if(S.settings.dueTimes.Midday!=='13:00'){S.settings.dueTimes.Midday='13:00';merged++;}}
+  /* apply Imran's PAR list to items still at zero */
+  S.items.forEach(it=>{const pl=PRELOADED_PARS[it.name];
+    if(pl&&Object.values(it.par).every(v=>!v)){
+      it.par={mon:pl.p[0],tue:pl.p[1],wed:pl.p[2],thu:pl.p[3],fri:pl.p[4],sat:pl.p[5],sun:pl.p[6]};
+      it.unit=pl.u;it.batch=pl.b;if(pl.n)it.name=pl.n;merged++;}});
+  /* v7: Garlic Bread joins Kitchen — set its PARs in Setup */
+  if(!S.items.some(i=>i.name==='Garlic Bread')){
+    const it={id:uid(),demo:false,name:'Garlic Bread',cat:'Kitchen',unit:'loaves',
+      par:{mon:0,tue:0,wed:0,thu:0,fri:0,sat:0,sun:0},batch:1,shelf:'',station:'Kitchen',
+      shift:'Opening',prio:'normal',prepMin:15,cost:0,active:true,notes:''};
+    S.items.push(it);merged++;
+    const gk=todayKey();
+    if(S.days[gk]&&!S.days[gk].closed)S.days[gk].entries.push({id:uid(),itemId:it.id,par:0,parBase:0,override:null,holiday:null,current:null,assignedTo:null,status:'not_started',emergency:false,startedAt:null,startedBy:null,completedAt:null,completedBy:null,late:false,qty:null,notes:''});
+  }
+  /* refresh today's open entries that had no PAR */
+  const tk=todayKey();
+  if(S.days[tk]&&!S.days[tk].closed){
+    const wd=weekdayOf(tk),h=holidayFor(tk),mult=h?(learnedMult(h)||h.mult):1;
+    S.days[tk].entries.forEach(e=>{
+      if(e.par===0&&e.status!=='completed'&&!e.override){
+        const it=item(e.itemId);
+        if(it&&it.par[wd]>0){e.parBase=it.par[wd];e.par=h?Math.ceil(it.par[wd]*mult):it.par[wd];}
+      }});
+  }
+  return merged;
+}
+
+/* ---------------- boot ---------------- */
+(async function(){
+  render();
+  const loaded=await loadState();
+  S=loaded||seed();
+  const merged=migrate();
+  if(!loaded||merged)saveState();
+  me=S.users[0]||{id:'crew',name:'Crew'};
+  ensureToday();
+  render();
+  setInterval(syncPull,20000);
+  liveSync();
+  if(fsOnline===false){
+    const b=document.createElement('div');b.id='offlineBanner';
+    b.style.cssText='position:sticky;top:0;z-index:999;background:#8a6d1a;color:#fff;font-size:11px;padding:5px 10px;text-align:center;font-weight:600';
+    b.textContent='No connection — saving on this phone, will sync when back online.';
+    document.body.prepend(b);
+    const watch=setInterval(()=>{if(fsOnline){clearInterval(watch);const x=document.getElementById('offlineBanner');if(x)x.remove();toast('✓ Back in sync');}},5000);
+  }
+})();
+</script>
+</body>
+</html>
